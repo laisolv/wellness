@@ -72,10 +72,11 @@ export class Dashboard implements OnInit {
 
 
     if (minutes < 1) return 'editado agora'
+
     if (minutes < 60) return `editado há ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`;
 
     if (hours < 24) {
-      return `editado há${minutes} ${minutes === 1 ? 'hora' : 'horas'}`;
+      return `editado há ${hours} ${hours === 1 ? 'hora' : 'horas'}`;
     }
 
     return `editado há ${days} ${days === 1 ? 'dia' : 'dias'}`;
