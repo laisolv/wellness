@@ -1,3 +1,4 @@
+
 <nav class="navigation">
 
   <!-- Identidade do Luma -->
@@ -48,15 +49,6 @@
     </a>
 
     <a
-      routerLink="/habits"
-      routerLinkActive="active"
-      aria-label="Hábitos"
-    >
-      <svg lucideCalendarCheck></svg>
-      <span>Hábitos</span>
-    </a>
-
-    <a
       routerLink="/profile"
       routerLinkActive="active"
       aria-label="Perfil"
@@ -65,9 +57,24 @@
       <span>Perfil</span>
     </a>
 
+    <!-- Alternar tema -->
+    <button
+      class="theme-toggle"
+      type="button"
+      (click)="toggleTheme()"
+      [attr.aria-label]="isDarkMode ? 'Ativar modo claro' : 'Ativar modo escuro'"
+      [attr.title]="isDarkMode ? 'Modo claro' : 'Modo escuro'"
+    >
+      @if (isDarkMode) {
+        <svg lucideSun></svg>
+      } @else {
+        <svg lucideMoon></svg>
+      }
+    </button>
+
   </div>
 
-  <!-- Assinatura no computador -->
+  <!-- Assinatura -->
   <div class="navigation-footer">
     <span>UM LUGAR PARA VOCÊ.</span>
   </div>

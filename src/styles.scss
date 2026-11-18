@@ -5,7 +5,7 @@ body {
 }
 
 :root {
-      /* cores principais */
+      /* cores principais - modo escuro */
   --color-background: #171717;
   --color-surface: #202020;
   --color-surface-hover: #292929;
@@ -26,13 +26,31 @@ body {
     --radius-medium: 12px;
 }
 
+
+:root[data-theme='light'] {
+    --color-background: #F5F5F0;
+    --color-surface: #FFFFFF;
+    --color-surface-hover: #EBEBE5;
+
+    --color-primary: #789D2F;
+  --color-text: #22231F;
+  --color-text-secondary: #77786F;
+  --color-border: #E1E1D9;
+
+  color-scheme: light;
+}
+
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    background-color: var(--color-background);
-    font-family: 'Inter', Arial, sans-serif;
-    color: var(--color-text);
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-background);
+  font-family: 'Inter', Arial, sans-serif;
+  color: var(--color-text);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
