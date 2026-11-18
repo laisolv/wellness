@@ -1,1 +1,38 @@
-/* You can add global styles to this file, and also import other style files */
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+:root {
+      /* cores principais */
+  --color-background: #171717;
+  --color-surface: #202020;
+  --color-surface-hover: #292929;
+
+  --color-primary: #C9F36B;
+  --color-text: #F5F4EF;
+  --color-text-secondary: #92928C;
+  --color-border: #383838;
+
+
+    /*espaçamentos */
+    --spacing-small: 8px;
+    --spacing-medium: 16px;
+    --spacing-large: 24px;
+
+    /*bordas*/
+    --radius-small: 8px;
+    --radius-medium: 12px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: var(--color-background);
+    font-family: 'Inter', Arial, sans-serif;
+    color: var(--color-text);
+}

@@ -1,0 +1,17 @@
+
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.app-content {
+  min-height: 100vh;
+  padding: 24px 16px 110px;
+}
+
+@media (min-width: 768px) {
+  .app-content {
+    margin-left: 0px;
+    padding: 40px;
+  }
+}

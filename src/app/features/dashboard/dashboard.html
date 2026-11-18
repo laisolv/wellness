@@ -1,0 +1,252 @@
+<section class="feed">
+
+  <!-- Cabeçalho do feed -->
+  <header class="feed-header">
+    <div>
+      <span class="feed-eyebrow">LUMA · SEU ESPAÇO</span>
+      
+    </div>
+  </header>
+
+  <!-- Entrada para criar publicação -->
+  <button
+    class="create-post"
+    type="button"
+    (click)="composerOpen.set(true)"
+  >
+    <span class="create-placeholder">o que você gostaria de registrar?</span>
+    <span class="plus">+</span>
+  </button>
+
+  <!-- Editor de publicação -->
+  @if (composerOpen()) {
+    <section class="composer">
+
+      <div class="composer-heading">
+        <span>{{ editingPublicationId() !== null ? 'editar registro' : 'novo registro' }}</span>
+      </div>
+
+      <textarea
+        #draftInput
+        [placeholder]="imagePreview()
+          ? 'escreva uma legenda para sua fotografia...'
+          : 'escreva o que está acontecendo...'"
+        rows="5"
+        [value]="draft()"
+        (input)="draft.set($any($event.target).value)"
+      ></textarea>
+
+      <!-- Prévia da fotografia -->
+      @if (imagePreview()) {
+        <div class="image-preview">
+          <img
+            [src]="imagePreview()"
+            alt="Prévia da fotografia selecionada"
+          >
+
+          <button
+            class="remove-photo"
+            type="button"
+            aria-label="Remover fotografia"
+            (click)="removePhoto()"
+          >
+            ×
+          </button>
+        </div>
+      }
+
+      <div class="composer-toolbar">
+
+        <div class="add-menu-container">
+          <button
+            class="add-button"
+            type="button"
+            aria-label="Adicionar conteúdo"
+            (click)="menuOpen.set(!menuOpen())"
+          >
+            +
+          </button>
+
+          @if (menuOpen()) {
+            <div class="add-menu">
+              <button
+                type="button"
+                (click)="addText(draftInput)"
+              >
+                Adicionar texto
+              </button>
+
+              <button
+                type="button"
+                (click)="addPhoto(photoInput)"
+              >
+                Adicionar fotografia
+              </button>
+            </div>
+          }
+        </div>
+
+        <input
+          #photoInput
+          type="file"
+          accept="image/*"
+          hidden
+          (change)="onImageSelected($event)"
+        >
+
+        <div class="composer-actions">
+          <button
+            class="cancel-button"
+            type="button"
+            (click)="composerOpen.set(false); draft.set(''); imagePreview.set(null); menuOpen.set(false)"
+          >
+            cancelar
+          </button>
+
+          <button
+            class="publish-button"
+            type="button"
+            [disabled]="!draft().trim() && !imagePreview()"
+            (click)="publish()"
+          >
+            {{ editingPublicationId() !== null ? 'salvar alterações' : 'publicar' }}
+          </button>
+        </div>
+
+      </div>
+    </section>
+  }
+
+  <!-- Lista de publicações -->
+  <section class="publications">
+
+    @if (publications().length === 0) {
+      <div class="empty-feed">
+        <span class="empty-decoration">✳</span>
+        <h2>seu espaço começa aqui.</h2>
+        <p>Registre pequenas coisas, grandes momentos ou simplesmente o seu dia.</p>
+      </div>
+    }
+
+    @for (post of publications(); track post.id) {
+
+      @if (isNewDay($index)) {
+        <div class="timeline-day">
+          <span class="timeline-day-dot"></span>
+          <span>{{ getDayLabel(post.date) }}</span>
+          <span class="timeline-day-date"></span>
+        </div>
+      }
+
+      <article class="publication">
+
+        <!-- Cabeçalho da publicação -->
+        <header class="publication-header">
+
+          <div class="publication-author">
+            <span class="avatar">L</span>
+            <div class="author-info">
+              <span>{{ formatDate(post.date) }}</span>
+              @if (getEditTime(post.editedAt); as editTime) {
+      <span class="publication-edited">{{ editTime }}</span>
+}
+            </div>
+          </div>
+
+          <div class="publication-menu">
+
+            <button
+              class="more"
+              type="button"
+              aria-label="Mais opções"
+              title="Mais opções"
+              (click)="toggleMenu(post.id)"
+            >
+              •••
+            </button>
+
+            @if (openMenuId() === post.id) {
+              <div class="menu-options">
+
+                <button
+                  type="button"
+                  (click)="editPublication(post)"
+                >
+                  editar publicação
+                </button>
+
+                <button
+                  type="button"
+                  class="delete-option"
+                  (click)="requestDelete(post.id)"
+                >
+                  excluir publicação
+                </button>
+
+              </div>
+            }
+
+          </div>
+        </header>
+
+        <!-- Fotografia -->
+        @if (post.image) {
+          <div class="publication-image">
+            <img
+              [src]="post.image"
+              alt="Fotografia da publicação"
+            >
+          </div>
+        }
+
+        <!-- Texto ou legenda -->
+        @if (post.content) {
+          <div class="publication-content">
+            <p>{{ post.content }}</p>
+          </div>
+        }
+
+      </article>
+    }
+
+  </section>
+
+    @if (confirmDeleteId() !== null) {
+    <div class="delete-overlay" (click)="cancelDelete()">
+
+      <div
+        class="delete-modal"
+        (click)="$event.stopPropagation()"
+      >
+        <span class="modal-eyebrow">LUMA · SEU ESPAÇO</span>
+
+        <h2>excluir publicação?</h2>
+
+        <p>
+          tem certeza de que deseja excluir este registro?
+          essa ação não poderá ser desfeita.
+        </p>
+
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="cancel-delete"
+            (click)="cancelDelete()"
+          >
+            cancelar
+          </button>
+
+          <button
+            type="button"
+            class="confirm-delete"
+            (click)="confirmDelete()"
+          >
+            excluir
+          </button>
+        </div>
+      </div>
+
+    </div>
+  }
+
+</section>

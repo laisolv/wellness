@@ -1,0 +1,75 @@
+<nav class="navigation">
+
+  <!-- Identidade do Luma -->
+  <div class="navigation-brand">
+    <a routerLink="/" class="brand-link">
+      <h1>LUMA<span>.</span></h1>
+    </a>
+  </div>
+
+  <!-- Navegação -->
+  <div class="navigation-links">
+
+    <a
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      aria-label="Início"
+    >
+      <svg lucideHouse></svg>
+      <span>Início</span>
+    </a>
+
+    <a
+      routerLink="/memories"
+      routerLinkActive="active"
+      aria-label="Memórias"
+    >
+      <svg lucideImages></svg>
+      <span>Memórias</span>
+    </a>
+
+    <a
+      routerLink="/library"
+      routerLinkActive="active"
+      aria-label="Biblioteca"
+    >
+      <svg lucideBookOpen></svg>
+      <span>Biblioteca</span>
+    </a>
+
+    <a
+      routerLink="/wellness"
+      routerLinkActive="active"
+      aria-label="Bem-estar"
+    >
+      <svg lucideHeartPulse></svg>
+      <span>Bem-estar</span>
+    </a>
+
+    <a
+      routerLink="/habits"
+      routerLinkActive="active"
+      aria-label="Hábitos"
+    >
+      <svg lucideCalendarCheck></svg>
+      <span>Hábitos</span>
+    </a>
+
+    <a
+      routerLink="/profile"
+      routerLinkActive="active"
+      aria-label="Perfil"
+    >
+      <svg lucideUser></svg>
+      <span>Perfil</span>
+    </a>
+
+  </div>
+
+  <!-- Assinatura no computador -->
+  <div class="navigation-footer">
+    <span>UM LUGAR PARA VOCÊ.</span>
+  </div>
+
+</nav>
