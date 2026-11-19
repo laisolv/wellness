@@ -91,10 +91,7 @@ export class Dashboard implements OnInit {
   protected readonly imagePreview = signal<string | null>(null);
 
   protected readonly confirmDeleteId = signal<number | null>(null);
-  
-
   protected readonly editingPublicationId = signal<number | null>(null);
-
   protected async deletePublication(id: number): Promise<void> {
     await this.publicationService.delete(id);
 
@@ -110,9 +107,9 @@ export class Dashboard implements OnInit {
 
   protected readonly publications = signal<Publication[]>([]);
 
-  protected addText(input: HTMLTextAreaElement): void {
+  protected addText(): void {
     this.menuOpen.set(false);
-    input.focus
+    this.composerOpen.set(true);
   }
 
 
@@ -137,6 +134,7 @@ export class Dashboard implements OnInit {
     reader.onload = () => {
       if(typeof reader.result === 'string') {
         this.imagePreview.set(reader.result);
+        this.composerOpen.set(true);
       }
     };
 
@@ -206,6 +204,8 @@ protected removePhoto(): void {
   protected editPublication(post: Publication): void {
     this.editingPublicationId.set(post.id);
     this.draft.set(post.content);
+    this.imagePreview.set(post.image);
+
     this.composerOpen.set(true);
     this.openMenuId.set(null);
   }
@@ -227,5 +227,14 @@ protected removePhoto(): void {
   if (id === null) return;
 
   this.deletePublication(id);
+}
+
+  protected closeComposer(): void {
+    this.composerOpen.set(false);
+    this.draft.set('');
+    this.imagePreview.set(null);
+    this.editingPublicationId.set(null);
+    this.menuOpen.set(false);
+  
 }
 }

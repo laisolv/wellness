@@ -1,104 +1,110 @@
+
 <section class="feed">
 
   <!-- Cabeçalho do feed -->
   <header class="feed-header">
     <div>
       <span class="feed-eyebrow">LUMA · SEU ESPAÇO</span>
-      
     </div>
   </header>
 
-  <!-- Entrada para criar publicação -->
+  <!-- Botão de nova publicação -->
   <button
     class="create-post"
     type="button"
-    (click)="composerOpen.set(true)"
+    (click)="menuOpen.set(!menuOpen())"
   >
-    <span class="create-placeholder">o que você gostaria de registrar?</span>
     <span class="plus">+</span>
   </button>
 
-  <!-- Editor de publicação -->
+  <!-- Opções de publicação -->
+  @if (menuOpen() && !composerOpen()) {
+    <div class="create-options">
+      <button
+        type="button"
+        (click)="addPhoto(photoInput)"
+      >
+        <span>▧</span>
+        Foto
+      </button>
+
+      <button
+        type="button"
+        (click)="addText()"
+      >
+        <span>✎</span>
+        Texto
+      </button>
+    </div>
+  }
+
+  <!-- Seletor de fotografia -->
+  <input
+    #photoInput
+    type="file"
+    accept="image/*"
+    hidden
+    (change)="onImageSelected($event)"
+  >
+
+  <!-- Editor flutuante -->
   @if (composerOpen()) {
-    <section class="composer">
+    <div class="composer-overlay" (click)="closeComposer()">
 
-      <div class="composer-heading">
-        <span>{{ editingPublicationId() !== null ? 'editar registro' : 'novo registro' }}</span>
-      </div>
+      <section
+        class="composer"
+        (click)="$event.stopPropagation()"
+      >
 
-      <textarea
-        #draftInput
-        [placeholder]="imagePreview()
-          ? 'escreva uma legenda para sua fotografia...'
-          : 'escreva o que está acontecendo...'"
-        rows="5"
-        [value]="draft()"
-        (input)="draft.set($any($event.target).value)"
-      ></textarea>
-
-      <!-- Prévia da fotografia -->
-      @if (imagePreview()) {
-        <div class="image-preview">
-          <img
-            [src]="imagePreview()"
-            alt="Prévia da fotografia selecionada"
-          >
+        <div class="composer-heading">
+      
 
           <button
-            class="remove-photo"
             type="button"
-            aria-label="Remover fotografia"
-            (click)="removePhoto()"
+            class="close-composer"
+            (click)="closeComposer()"
+            aria-label="Fechar"
           >
             ×
           </button>
         </div>
-      }
 
-      <div class="composer-toolbar">
+        <textarea
+          #draftInput
+          [placeholder]="imagePreview()
+            ? 'escreva uma legenda para sua fotografia...'
+            : 'o que está acontecendo?'"
+          rows="5"
+          [value]="draft()"
+          (input)="draft.set($any($event.target).value)"
+        ></textarea>
 
-        <div class="add-menu-container">
-          <button
-            class="add-button"
-            type="button"
-            aria-label="Adicionar conteúdo"
-            (click)="menuOpen.set(!menuOpen())"
-          >
-            +
-          </button>
+        <!-- Prévia da fotografia -->
+        @if (imagePreview()) {
+          <div class="image-preview">
+            <img
+              [src]="imagePreview()"
+              alt="Prévia da fotografia selecionada"
+            >
 
-          @if (menuOpen()) {
-            <div class="add-menu">
-              <button
-                type="button"
-                (click)="addText(draftInput)"
-              >
-                Adicionar texto
-              </button>
+            <button
+              class="remove-photo"
+              type="button"
+              aria-label="Remover fotografia"
+              (click)="removePhoto()"
+            >
+              ×
+            </button>
+          </div>
+        }
 
-              <button
-                type="button"
-                (click)="addPhoto(photoInput)"
-              >
-                Adicionar fotografia
-              </button>
-            </div>
-          }
-        </div>
-
-        <input
-          #photoInput
-          type="file"
-          accept="image/*"
-          hidden
-          (change)="onImageSelected($event)"
-        >
-
+        <!-- Ações do editor -->
         <div class="composer-actions">
+
           <button
             class="cancel-button"
             type="button"
-            (click)="composerOpen.set(false); draft.set(''); imagePreview.set(null); menuOpen.set(false)"
+            (click)="closeComposer()"
           >
             cancelar
           </button>
@@ -111,10 +117,11 @@
           >
             {{ editingPublicationId() !== null ? 'salvar alterações' : 'publicar' }}
           </button>
+
         </div>
 
-      </div>
-    </section>
+      </section>
+    </div>
   }
 
   <!-- Lista de publicações -->
@@ -124,7 +131,9 @@
       <div class="empty-feed">
         <span class="empty-decoration">✳</span>
         <h2>seu espaço começa aqui.</h2>
-        <p>Registre pequenas coisas, grandes momentos ou simplesmente o seu dia.</p>
+        <p>
+          Registre pequenas coisas, grandes momentos ou simplesmente o seu dia.
+        </p>
       </div>
     }
 
@@ -145,11 +154,15 @@
 
           <div class="publication-author">
             <span class="avatar">L</span>
+
             <div class="author-info">
               <span>{{ formatDate(post.date) }}</span>
+
               @if (getEditTime(post.editedAt); as editTime) {
-      <span class="publication-edited">{{ editTime }}</span>
-}
+                <span class="publication-edited">
+                  {{ editTime }}
+                </span>
+              }
             </div>
           </div>
 
@@ -185,6 +198,7 @@
 
               </div>
             }
+
           </div>
         </header>
 
@@ -210,7 +224,8 @@
 
   </section>
 
-    @if (confirmDeleteId() !== null) {
+  <!-- Modal de confirmação de exclusão -->
+  @if (confirmDeleteId() !== null) {
     <div class="delete-overlay" (click)="cancelDelete()">
 
       <div
@@ -227,6 +242,7 @@
         </p>
 
         <div class="modal-actions">
+
           <button
             type="button"
             class="cancel-delete"
@@ -242,6 +258,7 @@
           >
             excluir
           </button>
+
         </div>
       </div>
 

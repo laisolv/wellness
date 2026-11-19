@@ -1,1 +1,64 @@
-<p>memories works!</p>
+<section class="memories">
+
+    <header class="memories-header">
+
+        <div>
+            <span class="memories-eyebrow">LUMA · GALERIA</span>
+        </div>
+
+        <span class="memories-count">
+            {{ memories().length }} fotografias </span>
+    </header>
+
+    @if (memories().length > 0) {
+        <div class="memories-grid">
+            @for (memory of memories(); track memory.id) {
+                <button
+                class="memory-item"
+                type="button"
+                aria-label="visualizar memória"
+                (click)="openMemory(memory)"
+                >
+                <img
+                [src]="memory.image"
+                alt="fotografia de uma memória"
+                >
+                </button>
+            }
+        </div>
+    } @else {
+        <div class="memories-empty">
+            <span>✳</span>
+            <h2>suas memórias começam aqui.</h2>
+        </div>
+    }
+
+    @if (selectedMemory(); as memory) {
+        <div class="memory-overlay" (click)="closeMemory()">
+            <div class="memory-modal" (click)="$event.stopPropagation()">
+
+                <button
+                class="memory-close"
+                type="button"
+                aria-label="fechar fotografia"
+                (click)="closeMemory()"    
+                >×
+                </button>
+
+                <img
+                class="memory-expanded"
+                [src]="memory.image"
+                alt="fotografia ampliada"
+                >
+
+                @if (memory.content) {
+                    <p class="memory-caption">{{ memory.content }}</p>
+                }
+
+                <span class="memory-date">
+                    {{memory.date | date:'dd/MM/yyyy · HH:mm'}}
+                </span>
+            </div>
+        </div>
+    }
+</section>

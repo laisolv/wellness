@@ -1,0 +1,275 @@
+
+.memories {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+// Cabeçalho
+
+.memories-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+
+  .memories-eyebrow {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--color-primary);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -1.5px;
+  }
+
+  p {
+    margin: 5px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+  }
+
+  .memories-count {
+    padding-bottom: 4px;
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    white-space: nowrap;
+  }
+}
+
+// Grade de fotografias
+
+.memories-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.memory-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  overflow: hidden;
+
+  border: none;
+  background: var(--color-surface);
+
+  cursor: pointer;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.04);
+  }
+}
+
+// Galeria vazia
+
+.memories-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 300px;
+  padding: 30px 20px;
+
+  text-align: center;
+
+  > span {
+    margin-bottom: 16px;
+    color: var(--color-primary);
+    font-size: 30px;
+  }
+
+  h2 {
+    margin: 0 0 10px;
+    color: var(--color-text);
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  p {
+    max-width: 300px;
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+}
+
+// Telas pequenas
+
+@media (max-width: 480px) {
+  .memories-header {
+    h1 {
+      font-size: 30px;
+    }
+  }
+
+  .memories-grid {
+    gap: 3px;
+  }
+}
+
+
+ // Fundo escurecido e desfocado
+
+.memory-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  animation: memory-overlay-appear 0.25s ease both;
+}
+
+// Modal da fotografia
+
+.memory-modal {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+
+  animation: memory-image-appear 0.3s ease both;
+}
+
+// Fotografia ampliada
+
+.memory-expanded {
+  display: block;
+
+  max-width: 100%;
+  max-height: 72vh;
+
+  object-fit: contain;
+
+  border-radius: 8px;
+
+  box-shadow: 0 15px 60px rgba(0, 0, 0, 0.4);
+}
+
+// Botão fechar
+
+.memory-close {
+  position: absolute;
+  top: -42px;
+  right: 0;
+
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+
+  font-size: 25px;
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.22);
+  }
+}
+
+// Legenda
+
+.memory-caption {
+  width: 100%;
+  margin: 16px 0 0;
+
+  color: #F5F4EF;
+  font-size: 13px;
+  line-height: 1.7;
+  text-align: center;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+// Data
+
+.memory-date {
+  margin-top: 8px;
+
+  color: #92928C;
+  font-size: 11px;
+}
+
+// Animações
+
+@keyframes memory-overlay-appear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes memory-image-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Celular
+
+@media (max-width: 480px) {
+  .memory-overlay {
+    padding: 18px;
+  }
+
+  .memory-expanded {
+    max-height: 68vh;
+  }
+
+  .memory-modal {
+    max-width: 100%;
+  }
+}
+
