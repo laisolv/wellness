@@ -8,121 +8,15 @@
     </div>
   </header>
 
-  <!-- Botão de nova publicação -->
-  <button
-    class="create-post"
-    type="button"
-    (click)="menuOpen.set(!menuOpen())"
-  >
-    <span class="plus">+</span>
-  </button>
-
-  <!-- Opções de publicação -->
-  @if (menuOpen() && !composerOpen()) {
-    <div class="create-options">
-      <button
-        type="button"
-        (click)="addPhoto(photoInput)"
-      >
-        <span>▧</span>
-        Foto
-      </button>
-
-      <button
-        type="button"
-        (click)="addText()"
-      >
-        <span>✎</span>
-        Texto
-      </button>
-    </div>
-  }
-
-  <!-- Seletor de fotografia -->
-  <input
-    #photoInput
-    type="file"
-    accept="image/*"
-    hidden
-    (change)="onImageSelected($event)"
-  >
-
-  <!-- Editor flutuante -->
-  @if (composerOpen()) {
-    <div class="composer-overlay" (click)="closeComposer()">
-
-      <section
-        class="composer"
-        (click)="$event.stopPropagation()"
-      >
-
-        <div class="composer-heading">
-      
-
-          <button
-            type="button"
-            class="close-composer"
-            (click)="closeComposer()"
-            aria-label="Fechar"
-          >
-            ×
-          </button>
-        </div>
-
-        <textarea
-          #draftInput
-          [placeholder]="imagePreview()
-            ? 'escreva uma legenda para sua fotografia...'
-            : 'o que está acontecendo?'"
-          rows="5"
-          [value]="draft()"
-          (input)="draft.set($any($event.target).value)"
-        ></textarea>
-
-        <!-- Prévia da fotografia -->
-        @if (imagePreview()) {
-          <div class="image-preview">
-            <img
-              [src]="imagePreview()"
-              alt="Prévia da fotografia selecionada"
-            >
-
-            <button
-              class="remove-photo"
-              type="button"
-              aria-label="Remover fotografia"
-              (click)="removePhoto()"
-            >
-              ×
-            </button>
-          </div>
-        }
-
-        <!-- Ações do editor -->
-        <div class="composer-actions">
-
-          <button
-            class="cancel-button"
-            type="button"
-            (click)="closeComposer()"
-          >
-            cancelar
-          </button>
-
-          <button
-            class="publish-button"
-            type="button"
-            [disabled]="!draft().trim() && !imagePreview()"
-            (click)="publish()"
-          >
-            {{ editingPublicationId() !== null ? 'salvar alterações' : 'publicar' }}
-          </button>
-
-        </div>
-
-      </section>
-    </div>
-  }
+  <!-- Componente de criação de publicações -->
+  <app-composer
+    [open]="composerOpen()"
+    [initialContent]="draft()"
+    [initialImage]="imagePreview()"
+    [editing]="editingPublicationId() !== null"
+    (closed)="closeComposer()"
+    (submitted)="publish($event)">
+  </app-composer>
 
   <!-- Lista de publicações -->
   <section class="publications">
@@ -173,8 +67,7 @@
               type="button"
               aria-label="Mais opções"
               title="Mais opções"
-              (click)="toggleMenu(post.id)"
-            >
+              (click)="toggleMenu(post.id)">
               •••
             </button>
 
@@ -183,16 +76,14 @@
 
                 <button
                   type="button"
-                  (click)="editPublication(post)"
-                >
+                  (click)="editPublication(post)">
                   editar publicação
                 </button>
 
                 <button
                   type="button"
                   class="delete-option"
-                  (click)="requestDelete(post.id)"
-                >
+                  (click)="requestDelete(post.id)">
                   excluir publicação
                 </button>
 
@@ -207,8 +98,7 @@
           <div class="publication-image">
             <img
               [src]="post.image"
-              alt="Fotografia da publicação"
-            >
+              alt="Fotografia da publicação">
           </div>
         }
 
@@ -230,8 +120,8 @@
 
       <div
         class="delete-modal"
-        (click)="$event.stopPropagation()"
-      >
+        (click)="$event.stopPropagation()">
+
         <span class="modal-eyebrow">LUMA · SEU ESPAÇO</span>
 
         <h2>excluir publicação?</h2>
@@ -246,16 +136,14 @@
           <button
             type="button"
             class="cancel-delete"
-            (click)="cancelDelete()"
-          >
+            (click)="cancelDelete()">
             cancelar
           </button>
 
           <button
             type="button"
             class="confirm-delete"
-            (click)="confirmDelete()"
-          >
+            (click)="confirmDelete()">
             excluir
           </button>
 

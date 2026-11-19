@@ -5,6 +5,8 @@
 }
 
 .app-content {
+  view-transition-name: app-content;
+
   min-height: 100vh;
   padding: 24px 16px 110px;
 }

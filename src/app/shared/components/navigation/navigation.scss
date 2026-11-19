@@ -96,6 +96,7 @@
 
     &:hover {
       color: var(--color-primary);
+      background: var(--color-surface-hover);
     }
 
     &:active {
@@ -114,6 +115,11 @@
     cursor: pointer;
     font: inherit;
   }
+
+  svg {
+    transition: transform 0.4s ease;
+  }
+
 }
 
 // Navegação no computador

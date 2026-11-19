@@ -9,5 +9,5 @@ import { Navigation } from './shared/components/navigation/navigation';
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('wellness.');
+  protected readonly title = signal('luma');
 }

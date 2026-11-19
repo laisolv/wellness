@@ -1,0 +1,88 @@
+
+<div class="create-area">
+
+  <button
+    class="create-post"
+    type="button"
+    aria-label="Criar publicação"
+    (click)="menuOpen.update(value => !value)">
+    +
+  </button>
+
+  @if (menuOpen()) {
+    <div class="create-options">
+      <button type="button" (click)="addPhoto(photoInput)">
+        Foto
+      </button>
+
+      <button type="button" (click)="addText()">
+        Texto
+      </button>
+    </div>
+  }
+
+  <input
+    #photoInput
+    type="file"
+    accept="image/*"
+    hidden
+    (change)="onImageSelected($event)"
+  />
+
+</div>
+
+@if (open || localOpen()) {
+  <div class="composer-overlay" (click)="closeComposer()">
+
+    <div class="composer" (click)="$event.stopPropagation()">
+
+      <div class="composer-heading">
+        <button
+          class="close-composer"
+          type="button"
+          aria-label="Fechar"
+          (click)="closeComposer()">
+          ×
+        </button>
+      </div>
+
+      <textarea
+        placeholder="O que está acontecendo?"
+        [value]="draft()"
+        (input)="draft.set($any($event.target).value)">
+      </textarea>
+
+      @if (imagePreview()) {
+        <div class="image-preview">
+          <img [src]="imagePreview()" alt="Prévia da imagem" />
+
+          <button
+            class="remove-photo"
+            type="button"
+            (click)="removePhoto()">
+            ×
+          </button>
+        </div>
+      }
+
+      <div class="composer-actions">
+        <button
+          class="cancel-button"
+          type="button"
+          (click)="closeComposer()">
+          Cancelar
+        </button>
+
+        <button
+          class="publish-button"
+          type="button"
+          [disabled]="!draft().trim() && !imagePreview()"
+          (click)="publish()">
+          {{ editing ? 'Salvar alterações' : 'Publicar' }}
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+}
