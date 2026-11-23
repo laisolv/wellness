@@ -8,7 +8,7 @@
 // Cabeçalho
 
 .feed-header {
-  margin-bottom: 30px;
+  margin-bottom: 38px;
 
   .feed-eyebrow {
     display: block;
@@ -21,6 +21,7 @@
 
   h1 {
     margin: 0;
+    color: var(--color-text);
     font-size: 34px;
     font-weight: 700;
     letter-spacing: -1.5px;
@@ -31,9 +32,10 @@
   }
 
   p {
-    margin: 5px 0 0;
+    margin: 8px 0 0;
     color: var(--color-text-secondary);
     font-size: 14px;
+    line-height: 1.6;
   }
 }
 
@@ -64,15 +66,29 @@
 .publication {
   padding: 22px 0 28px;
   border-bottom: 1px solid var(--color-border);
+  animation: publication-enter 300ms ease both;
 
   &:first-child {
     padding-top: 8px;
   }
 }
 
-// Timeline
+@keyframes publication-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Linha do tempo
 
 .timeline-day {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -82,24 +98,29 @@
   font-weight: 700;
   letter-spacing: 1.2px;
 
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+    opacity: 0.7;
+  }
+
   .timeline-day-dot {
     width: 7px;
     height: 7px;
     flex-shrink: 0;
     border-radius: 50%;
     background: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(201, 243, 107, 0.08);
   }
 
   .timeline-day-date {
-    margin-left: auto;
-    color: var(--color-text-secondary);
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: 0.4px;
+    display: none;
   }
 }
 
-// Cabeçalho de cada publicação
+// Cabeçalho da publicação
 
 .publication-header {
   display: flex;
@@ -119,12 +140,6 @@
   flex-direction: column;
   gap: 4px;
 
-  strong {
-    color: var(--color-text);
-    font-size: 13px;
-    font-weight: 600;
-  }
-
   span {
     color: var(--color-text-secondary);
     font-size: 11px;
@@ -138,7 +153,7 @@
   font-size: 11px;
 }
 
-// Menu da publicação
+// Menu
 
 .publication-menu {
   position: relative;
@@ -154,10 +169,17 @@
   cursor: pointer;
   font-size: 19px;
   letter-spacing: 1px;
+  transition: background 0.2s, color 0.2s;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: var(--color-surface-hover);
     color: var(--color-text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 }
 
@@ -170,8 +192,9 @@
   background: var(--color-surface-hover);
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  //box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   z-index: 20;
+  animation: menu-enter 150ms ease both;
 
   button {
     display: block;
@@ -186,8 +209,13 @@
     text-align: left;
     cursor: pointer;
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       background: var(--color-surface);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
     }
   }
 
@@ -200,11 +228,30 @@
   }
 }
 
-// Fotografia da publicação
+@keyframes menu-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Fotografias
 
 .publication-image {
+  position: relative;
+  display: block;
   width: 100%;
+  padding: 0;
   overflow: hidden;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: zoom-in;
 
   img {
     display: block;
@@ -212,10 +259,41 @@
     max-height: 480px;
     height: auto;
     object-fit: contain;
+    transition: transform 300ms ease;
+  }
+
+  &:hover img {
+    transform: scale(1.015);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+  }
+
+  .image-zoom {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    font-size: 11px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  &:hover .image-zoom,
+  &:focus-visible .image-zoom {
+    opacity: 1;
   }
 }
 
-// Texto da publicação
+// Texto
 
 .publication-content {
   margin-top: 16px;
@@ -227,6 +305,95 @@
     line-height: 1.8;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+  }
+}
+
+// Visualização ampliada
+
+.image-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  background: rgba(0, 0, 0, 0.86);
+  backdrop-filter: blur(12px);
+  animation: image-overlay-enter 180ms ease both;
+}
+
+.expanded-image {
+  display: block;
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 8px;
+  animation: image-enter 200ms ease both;
+}
+
+.image-close,
+.image-navigation {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+}
+
+.image-close {
+  top: 22px;
+  right: 24px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-size: 28px;
+}
+
+.image-navigation {
+  top: 50%;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-size: 30px;
+  transform: translateY(-50%);
+}
+
+.previous {
+  left: 20px;
+}
+
+.next {
+  right: 20px;
+}
+
+@keyframes image-overlay-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes image-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -263,7 +430,7 @@
 .delete-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 1200;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -318,6 +485,11 @@
     &:hover {
       opacity: 0.8;
     }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 3px;
+    }
   }
 
   .cancel-delete {
@@ -333,12 +505,18 @@
   }
 }
 
-// Ajustes para telas pequenas
+// Responsividade
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .feed-header {
+    margin-bottom: 28px;
+
     h1 {
       font-size: 30px;
+    }
+
+    p {
+      font-size: 13px;
     }
   }
 
@@ -346,4 +524,41 @@
     padding-bottom: 22px;
   }
 
+  .image-overlay {
+    padding: 50px 18px;
+  }
+
+  .image-navigation {
+    width: 36px;
+    height: 36px;
+  }
+
+  .previous {
+    left: 8px;
+  }
+
+  .next {
+    right: 8px;
+  }
+
+  .image-close {
+    top: 12px;
+    right: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .publication,
+  .menu-options,
+  .image-overlay,
+  .expanded-image {
+    animation: none;
+  }
+
+  .publication-image img,
+  .more,
+  .image-close,
+  .image-navigation {
+    transition: none;
+  }
 }

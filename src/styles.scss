@@ -1,44 +1,55 @@
+
 html,
 body {
   margin: 0;
   min-height: 100%;
 }
 
+/* =================================
+   LUMA — SÁLVIA SOFISTICADO
+================================= */
+
 :root {
-      /* cores principais - modo escuro */
-  --color-background: #171717;
-  --color-surface: #202020;
-  --color-surface-hover: #292929;
+  color-scheme: dark;
 
-  --color-primary: #C9F36B;
-  --color-text: #F5F4EF;
-  --color-text-secondary: #92928C;
-  --color-border: #383838;
+  /* Cores principais — modo escuro */
+  --color-background: #141615;
+  --color-surface: #1C201D;
+  --color-surface-hover: #262C27;
 
+  --color-primary: #B8D98A;
+  --color-text: #F0F1E9;
+  --color-text-secondary: #969D92;
+  --color-border: #343B35;
 
-    /*espaçamentos */
-    --spacing-small: 8px;
-    --spacing-medium: 16px;
-    --spacing-large: 24px;
+  /* Espaçamentos */
+  --spacing-small: 8px;
+  --spacing-medium: 16px;
+  --spacing-large: 24px;
 
-    /*bordas*/
-    --radius-small: 8px;
-    --radius-medium: 12px;
+  /* Bordas */
+  --radius-small: 8px;
+  --radius-medium: 12px;
 }
 
+/* Modo claro */
 
 :root[data-theme='light'] {
-    --color-background: #F5F5F0;
-    --color-surface: #FFFFFF;
-    --color-surface-hover: #EBEBE5;
-
-    --color-primary: #789D2F;
-  --color-text: #22231F;
-  --color-text-secondary: #77786F;
-  --color-border: #E1E1D9;
-
   color-scheme: light;
+
+  --color-background: #F4F5EF;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #E9EDE3;
+
+  --color-primary: #789B4A;
+  --color-text: #252922;
+  --color-text-secondary: #777D72;
+  --color-border: #DEE4D8;
 }
+
+/* =================================
+   CONFIGURAÇÕES GERAIS
+================================= */
 
 * {
   box-sizing: border-box;
@@ -47,13 +58,20 @@ body {
 body {
   margin: 0;
   min-height: 100vh;
+
   background-color: var(--color-background);
+
   font-family: 'Inter', Arial, sans-serif;
   color: var(--color-text);
+
   transition:
     background-color 0.25s ease,
     color 0.25s ease;
 }
+
+/* =================================
+   TRANSIÇÕES ENTRE PÁGINAS
+================================= */
 
 ::view-transition-old(app-content) {
   animation: page-out 200ms ease both;
@@ -68,7 +86,6 @@ body {
     opacity: 0;
     transform: translateY(-4px);
   }
-  
 }
 
 @keyframes page-in {

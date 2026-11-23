@@ -1,14 +1,15 @@
 
 <section class="feed">
 
-  <!-- Cabeçalho do feed -->
+  <!-- Cabeçalho -->
   <header class="feed-header">
     <div>
       <span class="feed-eyebrow">LUMA · SEU ESPAÇO</span>
+      <h1>um pouco do seu dia<span>.</span></h1>
     </div>
   </header>
 
-  <!-- Componente de criação de publicações -->
+  <!-- Criação de publicações -->
   <app-composer
     [open]="composerOpen()"
     [initialContent]="draft()"
@@ -18,7 +19,7 @@
     (submitted)="publish($event)">
   </app-composer>
 
-  <!-- Lista de publicações -->
+  <!-- Publicações -->
   <section class="publications">
 
     @if (publications().length === 0) {
@@ -43,11 +44,10 @@
 
       <article class="publication">
 
-        <!-- Cabeçalho da publicação -->
         <header class="publication-header">
 
           <div class="publication-author">
-            <span class="avatar">L</span>
+            <span class="avatar" aria-label="Perfil da Luma">L</span>
 
             <div class="author-info">
               <span>{{ formatDate(post.date) }}</span>
@@ -65,8 +65,9 @@
             <button
               class="more"
               type="button"
-              aria-label="Mais opções"
+              aria-label="Mais opções da publicação"
               title="Mais opções"
+              [attr.aria-expanded]="openMenuId() === post.id"
               (click)="toggleMenu(post.id)">
               •••
             </button>
@@ -93,16 +94,26 @@
           </div>
         </header>
 
-        <!-- Fotografia -->
         @if (post.image) {
-          <div class="publication-image">
+          <button
+            type="button"
+            class="publication-image"
+            (click)="openImage(post.image)"
+            aria-label="Ampliar fotografia">
+
             <img
               [src]="post.image"
-              alt="Fotografia da publicação">
-          </div>
+              alt="Fotografia da publicação"
+              loading="lazy">
+
+            <span class="image-zoom">
+              <span aria-hidden="true">⌕</span>
+              ampliar
+            </span>
+
+          </button>
         }
 
-        <!-- Texto ou legenda -->
         @if (post.content) {
           <div class="publication-content">
             <p>{{ post.content }}</p>
@@ -114,9 +125,50 @@
 
   </section>
 
-  <!-- Modal de confirmação de exclusão -->
+  <!-- Visualização ampliada da fotografia -->
+  @if (selectedImage()) {
+    <div
+      class="image-overlay"
+      (click)="closeImage()">
+
+      <button
+        type="button"
+        class="image-close"
+        aria-label="Fechar fotografia"
+        (click)="closeImage()">
+        ×
+      </button>
+
+      <button
+        type="button"
+        class="image-navigation previous"
+        aria-label="Fotografia anterior"
+        (click)="previousImage($event)">
+        ‹
+      </button>
+
+      <img
+        class="expanded-image"
+        [src]="selectedImage()"
+        alt="Fotografia ampliada"
+        (click)="$event.stopPropagation()">
+
+      <button
+        type="button"
+        class="image-navigation next"
+        aria-label="Próxima fotografia"
+        (click)="nextImage($event)">
+        ›
+      </button>
+
+    </div>
+  }
+
+  <!-- Confirmação de exclusão -->
   @if (confirmDeleteId() !== null) {
-    <div class="delete-overlay" (click)="cancelDelete()">
+    <div
+      class="delete-overlay"
+      (click)="cancelDelete()">
 
       <div
         class="delete-modal"
@@ -149,7 +201,6 @@
 
         </div>
       </div>
-
     </div>
   }
 

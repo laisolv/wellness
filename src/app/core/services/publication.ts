@@ -1,6 +1,7 @@
 
 import Dexie, { Table } from 'dexie';
 import { Injectable } from '@angular/core';
+import { LibraryItem } from '../models/library-item';
 
 interface Publication {
   id: number;
@@ -11,6 +12,7 @@ interface Publication {
 
 class LumaDatabase extends Dexie {
   publications!: Table<Publication, number>;
+  libraryItems!: Table<LibraryItem, number>;
 
   constructor() {
     super('LumaDatabase');
@@ -18,6 +20,11 @@ class LumaDatabase extends Dexie {
     this.version(1).stores({
       publications: 'id, category, date'
     });
+
+    this.version(2).stores({
+      publications: 'id, category, date',
+      libraryItems: '++id, type, title'
+    })
   }
 }
 
@@ -41,5 +48,21 @@ export class PublicationService {
 
   update(publication: Publication) {
     return this.db.publications.put(publication);
+  }
+
+  getLibraryItems() {
+    return this.db.libraryItems.orderBy('id').reverse().toArray();
+  }
+
+  addLibraryItem(item: LibraryItem) {
+    return this.db.libraryItems.add(item);
+  }
+
+  deleteLibraryItem(id: number) {
+    return this.db.libraryItems.delete(id);
+  }
+
+  updateLibraryItem(item: LibraryItem) {
+    return this.db.libraryItems.put(item);
   }
 }

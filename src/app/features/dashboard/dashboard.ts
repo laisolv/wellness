@@ -1,5 +1,4 @@
-
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, HostListener } from '@angular/core';
 import { Publication } from '../../core/models/publication';
 import { PublicationService } from '../../core/services/publication';
 import { Composer } from './composer/composer';
@@ -23,11 +22,17 @@ export class Dashboard implements OnInit {
   protected readonly openMenuId = signal<number | null>(null);
   protected readonly publications = signal<Publication[]>([]);
 
+  // Visualização de fotografias
+  protected readonly selectedImage = signal<string | null>(null);
+  protected readonly selectedImageIndex = signal<number | null>(null);
+
   ngOnInit(): void {
     this.publicationService.getAll().then(publications => {
       this.publications.set(publications);
     });
   }
+
+  // Timeline
 
   protected isNewDay(index: number): boolean {
     if (index === 0) return true;
@@ -94,16 +99,7 @@ export class Dashboard implements OnInit {
     return `editado há ${days} ${days === 1 ? 'dia' : 'dias'}`;
   }
 
-  protected async deletePublication(id: number): Promise<void> {
-    await this.publicationService.delete(id);
-
-    this.publications.update(posts =>
-      posts.filter(post => post.id !== id)
-    );
-
-    this.openMenuId.set(null);
-    this.confirmDeleteId.set(null);
-  }
+  // Cadastro e edição
 
   protected async publish(data: {
     content: string;
@@ -152,10 +148,11 @@ export class Dashboard implements OnInit {
     this.composerOpen.set(false);
   }
 
-  protected toggleMenu(id: number): void {
-    this.openMenuId.update(currentId =>
-      currentId === id ? null : id
-    );
+  protected closeComposer(): void {
+    this.composerOpen.set(false);
+    this.draft.set('');
+    this.imagePreview.set(null);
+    this.editingPublicationId.set(null);
   }
 
   protected editPublication(post: Publication): void {
@@ -166,6 +163,28 @@ export class Dashboard implements OnInit {
     this.composerOpen.set(true);
     this.openMenuId.set(null);
   }
+
+  // Menu de opções
+
+  protected toggleMenu(id: number): void {
+    this.openMenuId.update(currentId =>
+      currentId === id ? null : id
+    );
+  }
+
+  @HostListener('document:click', ['$event'])
+  protected closeMenuOnOutsideClick(event: MouseEvent): void {
+    const target = event.target;
+
+    if (
+      target instanceof Element &&
+      !target.closest('.publication-menu')
+    ) {
+      this.openMenuId.set(null);
+    }
+  }
+
+  // Exclusão
 
   protected requestDelete(id: number): void {
     this.confirmDeleteId.set(id);
@@ -184,10 +203,71 @@ export class Dashboard implements OnInit {
     this.deletePublication(id);
   }
 
-  protected closeComposer(): void {
-    this.composerOpen.set(false);
-    this.draft.set('');
-    this.imagePreview.set(null);
-    this.editingPublicationId.set(null);
+  protected async deletePublication(id: number): Promise<void> {
+    await this.publicationService.delete(id);
+
+    this.publications.update(posts =>
+      posts.filter(post => post.id !== id)
+    );
+
+    this.openMenuId.set(null);
+    this.confirmDeleteId.set(null);
+  }
+
+  // Visualização ampliada das fotografias
+
+  protected openImage(image: string): void {
+    const images = this.getImages();
+    const index = images.indexOf(image);
+
+    this.selectedImageIndex.set(index);
+    this.selectedImage.set(image);
+    this.openMenuId.set(null);
+  }
+
+  protected closeImage(): void {
+    this.selectedImage.set(null);
+    this.selectedImageIndex.set(null);
+  }
+
+  protected previousImage(event: MouseEvent): void {
+    event.stopPropagation();
+
+    const images = this.getImages();
+    if (images.length === 0) return;
+
+    const currentIndex = this.selectedImageIndex() ?? 0;
+    const previousIndex =
+      (currentIndex - 1 + images.length) % images.length;
+
+    this.selectedImageIndex.set(previousIndex);
+    this.selectedImage.set(images[previousIndex]);
+  }
+
+  protected nextImage(event: MouseEvent): void {
+    event.stopPropagation();
+
+    const images = this.getImages();
+    if (images.length === 0) return;
+
+    const currentIndex = this.selectedImageIndex() ?? 0;
+    const nextIndex = (currentIndex + 1) % images.length;
+
+    this.selectedImageIndex.set(nextIndex);
+    this.selectedImage.set(images[nextIndex]);
+  }
+
+  private getImages(): string[] {
+    return this.publications()
+      .filter(post => post.image !== null)
+      .map(post => post.image as string);
+  }
+
+  // Tecla Escape fecha as visualizações
+
+  @HostListener('document:keydown.escape')
+  protected closeOverlays(): void {
+    this.closeImage();
+    this.openMenuId.set(null);
   }
 }

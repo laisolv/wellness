@@ -1,51 +1,225 @@
+
 <section class="library">
 
-    <header class="library-header">
-        <div>
-            <span class="library-eyebrow">LUMA · BIBLIOTECA</span>
-        </div>
+  <header class="library-header">
+    <div>
+      <span class="library-eyebrow">LUMA · BIBLIOTECA</span>
+    </div>
 
-        <p>acompanhe seus livros e jogos, e veja seu progresso!</p>
-    </header>
+    <p>acompanhe seus livros, jogos e filmes!</p>
+  </header>
 
-    <div class="library-toolbar">
+  <div class="library-toolbar">
 
-        <div class="library-filters">
-            <button
+    <div class="library-filters">
+      <button
+        type="button"
+        (click)="activeFilter.set('tudo')"
+        [class.active]="activeFilter() === 'tudo'"
+      >
+        tudo
+      </button>
+
+      <button
+        type="button"
+        (click)="activeFilter.set('livros')"
+        [class.active]="activeFilter() === 'livros'"
+      >
+        livros
+      </button>
+
+      <button
+        type="button"
+        (click)="activeFilter.set('jogos')"
+        [class.active]="activeFilter() === 'jogos'"
+      >
+        jogos
+      </button>
+
+      <button
+        type="button"
+        (click)="activeFilter.set('filmes')"
+        [class.active]="activeFilter() === 'filmes'"
+      >
+        filmes
+      </button>
+    </div>
+
+    @if (formOpen()) {
+      <div class="library-form-overlay">
+        <div class="library-form">
+
+          <h2>adicionar à biblioteca</h2>
+
+          <button
             type="button"
-            class="active"
+            class="form-close"
+            (click)="formOpen.set(false)"
+            aria-label="fechar formulário"
+          >
+            ×
+          </button>
+
+          <label for="item-title">nome</label>
+          <input
+            id="item-title"
+            type="text"
+            placeholder="nome do livro, jogo ou filme"
+            [value]="newTitle()"
+            (input)="newTitle.set($any($event.target).value)"
+          />
+
+          <label for="item-type">categoria</label>
+          <select
+            id="item-type"
+            [value]="newType()"
+            (change)="newType.set($any($event.target).value)"
+          >
+            <option value="livro">livro</option>
+            <option value="jogo">jogo</option>
+            <option value="filme">filme</option>
+          </select>
+
+          <label for="item-description">suas impressões</label>
+          <textarea
+            id="item-description"
+            placeholder="o que você achou?"
+            [value]="newDescription()"
+            (input)="newDescription.set($any($event.target).value)"
+          ></textarea>
+
+          <label for="item-rating">sua avaliação</label>
+          <select
+            id="item-rating"
+            [value]="newRating()"
+            (change)="newRating.set(+$any($event.target).value)"
+          >
+            <option value="5">★★★★★</option>
+            <option value="4">★★★★</option>
+            <option value="3">★★★</option>
+            <option value="2">★★</option>
+            <option value="1">★</option>
+          </select>
+
+          <label for="item-image" class="image-upload">
+            <span class="upload-icon">＋</span>
+            <span>adicionar capa</span>
+          </label>
+
+          <input
+            id="item-image"
+            class="image-input"
+            type="file"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+          />
+
+          @if (newImage()) {
+            <div class="image-preview">
+              <img
+                [src]="newImage()"
+                alt="prévia da capa selecionada"
+              />
+            </div>
+          }
+
+          <div class="library-form-actions">
+            <button
+              type="button"
+              (click)="formOpen.set(false)"
             >
-            tudo</button>
+              cancelar
+            </button>
+
             <button
-            type="button"
-            >livros</button>
-            <button
-            type="button"
-            >jogos</button>
+              type="button"
+              (click)="addItem()"
+            >
+              adicionar à biblioteca
+            </button>
+          </div>
+
+        </div>
+      </div>
+    }
+
+    <div class="library-actions">
+      <button
+        type="button"
+        (click)="formOpen.set(true)"
+      >
+        + adicionar item
+      </button>
+    </div>
+
+  </div>
+
+  <div class="library-content">
+
+    @for (item of filteredItems(); track item.id) {
+      <div class="library-item">
+
+        <div class="item-cover">
+          <img
+            [src]="item.image"
+            [alt]="item.title"
+          />
         </div>
 
-        <div class="library-actions">
-            <button
-            type="button">
-            + adicionar item    
+        <div class="item-info">
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+
+          @if (item.rating) {
+            <div class="item-rating">
+              @for (star of [1, 2, 3, 4, 5]; track star) {
+                <span [class.filled]="star <= item.rating">★</span>
+              }
+            </div>
+          }
+        </div>
+
+        <button
+        type="button"
+        class="delete-item"
+        (click)="itemToDelete.set(item.id ?? null)"
+        aria-label="excluir-item"
+        title="excluir-item"
+        >
+        ×
         </button>
-        </div>
-    </div>
+      </div>
+    }
 
-    <div class="library-content">
+  </div>
 
-        <div class="library-item">
-            <div class="item-cover">
-                <img
-                src="/assets/images.jpg"
-                alt="capa de the legend of zelda: ocarina of time"
+  @if(itemToDelete() !== null) {
+    
+    <div class="delete-overlay">
+        <div class="delete-modal">
+
+            <h2>excluir item?</h2>
+
+            <p>essa ação não poderá ser desfeita.</p>
+
+            <div class="delete-actions">
+                <button
+                type="button"
+                (click)="itemToDelete.set(null)"
                 >
+                cancelar
+                </button>
 
-            </div>
-            <div class="item-info">
-                <h3>The Legend of Zelda: Ocarina of Time</h3>
-                <p>ainda não joguei</p>
+                <button
+                type="button"
+                class="confirm-delete"
+                (click)="confirmDelete()"
+                >
+                    excluir
+                </button>
             </div>
         </div>
     </div>
+  }
+
 </section>
