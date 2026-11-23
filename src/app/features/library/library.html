@@ -1,4 +1,3 @@
-
 <section class="library">
 
   <header class="library-header">
@@ -56,109 +55,10 @@
 
   </div>
 
-  @if (formOpen()) {
-  <div class="library-form-overlay" (click)="formOpen.set(false)">
-    <div
-      class="library-form"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="form-title"
-      (click)="$event.stopPropagation()"
-    >
-      <header class="form-header">
-        <h2 id="form-title">adicionar à biblioteca</h2>
-        <button
-          type="button"
-          class="form-close"
-          (click)="formOpen.set(false)"
-          aria-label="fechar formulário"
-        >×</button>
-      </header>
-
-      <div class="form-body">
-        <label for="item-title">nome</label>
-        <input
-          id="item-title"
-          type="text"
-          placeholder="nome do livro, jogo ou filme"
-          [value]="newTitle()"
-          (input)="newTitle.set($any($event.target).value)"
-        />
-
-        <div class="form-row">
-          <div>
-            <label for="item-type">categoria</label>
-            <select
-              id="item-type"
-              [value]="newType()"
-              (change)="newType.set($any($event.target).value)"
-            >
-              <option value="livro">livro</option>
-              <option value="jogo">jogo</option>
-              <option value="filme">filme</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="item-rating">avaliação</label>
-            <select
-              id="item-rating"
-              [value]="newRating()"
-              (change)="newRating.set(+$any($event.target).value)"
-            >
-              <option value="5">★★★★★</option>
-              <option value="4">★★★★</option>
-              <option value="3">★★★</option>
-              <option value="2">★★</option>
-              <option value="1">★</option>
-            </select>
-          </div>
-        </div>
-
-        <label for="item-description">suas impressões</label>
-        <textarea
-          id="item-description"
-          placeholder="o que você achou?"
-          [value]="newDescription()"
-          (input)="newDescription.set($any($event.target).value)"
-        ></textarea>
-
-        <div class="form-cover">
-          <label for="item-image" class="image-upload">
-            <span class="upload-icon">＋</span>
-            <span>adicionar capa</span>
-          </label>
-
-          @if (newImage()) {
-            <div class="image-preview">
-              <img [src]="newImage()" alt="prévia da capa selecionada" />
-            </div>
-          }
-        </div>
-
-        <input
-          id="item-image"
-          class="image-input"
-          type="file"
-          accept="image/*"
-          (change)="onImageSelected($event)"
-        />
-      </div>
-
-      <footer class="library-form-actions">
-        <button type="button" (click)="formOpen.set(false)">cancelar</button>
-        <button type="button" (click)="addItem()">adicionar à biblioteca</button>
-      </footer>
-    </div>
-  </div>
-}
-
   <div class="library-content">
 
     @for (item of filteredItems(); track item.id) {
-      <div class="library-item">
-
-        <span class="item-type">{{ item.type }}</span>
+      <div class="library-item" [attr.data-type]="item.type">
 
         <div class="item-cover">
           <img
@@ -168,6 +68,8 @@
         </div>
 
         <div class="item-info">
+          <span class="item-type">{{ item.type }}</span>
+
           <h3>{{ item.title }}</h3>
           <p>{{ item.description }}</p>
 
@@ -181,45 +83,141 @@
         </div>
 
         <button
-        type="button"
-        class="delete-item"
-        (click)="itemToDelete.set(item.id ?? null)"
-        aria-label="excluir-item"
-        title="excluir-item"
+          type="button"
+          class="delete-item"
+          (click)="itemToDelete.set(item.id ?? null)"
+          aria-label="excluir item"
+          title="excluir item"
         >
-        ×
+          ×
         </button>
       </div>
     }
 
   </div>
 
-  @if(itemToDelete() !== null) {
-    
-    <div class="delete-overlay">
-        <div class="delete-modal">
+  @if (formOpen()) {
+    <div class="library-form-overlay" (click)="formOpen.set(false)">
+      <div
+        class="library-form"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="form-title"
+        (click)="$event.stopPropagation()"
+      >
+        <header class="form-header">
+          <h2 id="form-title">adicionar à biblioteca</h2>
+          <button
+            type="button"
+            class="form-close"
+            (click)="formOpen.set(false)"
+            aria-label="fechar formulário"
+          >×</button>
+        </header>
 
-            <h2>excluir item?</h2>
+        <div class="form-body">
+          <label for="item-title">nome</label>
+          <input
+            id="item-title"
+            type="text"
+            placeholder="nome do livro, jogo ou filme"
+            [value]="newTitle()"
+            (input)="newTitle.set($any($event.target).value)"
+          />
 
-            <p>essa ação não poderá ser desfeita.</p>
-
-            <div class="delete-actions">
-                <button
-                type="button"
-                (click)="itemToDelete.set(null)"
-                >
-                cancelar
-                </button>
-
-                <button
-                type="button"
-                class="confirm-delete"
-                (click)="confirmDelete()"
-                >
-                    excluir
-                </button>
+          <div class="form-row">
+            <div>
+              <label for="item-type">categoria</label>
+              <select
+                id="item-type"
+                [value]="newType()"
+                (change)="newType.set($any($event.target).value)"
+              >
+                <option value="livro">livro</option>
+                <option value="jogo">jogo</option>
+                <option value="filme">filme</option>
+              </select>
             </div>
+
+            <div>
+              <label for="item-rating">avaliação</label>
+              <select
+                id="item-rating"
+                [value]="newRating()"
+                (change)="newRating.set(+$any($event.target).value)"
+              >
+                <option value="5">★★★★★</option>
+                <option value="4">★★★★</option>
+                <option value="3">★★★</option>
+                <option value="2">★★</option>
+                <option value="1">★</option>
+              </select>
+            </div>
+          </div>
+
+          <label for="item-description">suas impressões</label>
+          <textarea
+            id="item-description"
+            placeholder="o que você achou?"
+            [value]="newDescription()"
+            (input)="newDescription.set($any($event.target).value)"
+          ></textarea>
+
+          <div class="form-cover">
+            <label for="item-image" class="image-upload">
+              <span class="upload-icon">＋</span>
+              <span>adicionar capa</span>
+            </label>
+
+            @if (newImage()) {
+              <div class="image-preview">
+                <img [src]="newImage()" alt="prévia da capa selecionada" />
+              </div>
+            }
+          </div>
+
+          <input
+            id="item-image"
+            class="image-input"
+            type="file"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+          />
         </div>
+
+        <footer class="library-form-actions">
+          <button type="button" (click)="formOpen.set(false)">cancelar</button>
+          <button type="button" (click)="addItem()">adicionar à biblioteca</button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  @if (itemToDelete() !== null) {
+    <div class="delete-overlay">
+      <div class="delete-modal">
+
+        <h2>excluir item?</h2>
+
+        <p>essa ação não poderá ser desfeita.</p>
+
+        <div class="delete-actions">
+          <button
+            type="button"
+            (click)="itemToDelete.set(null)"
+          >
+            cancelar
+          </button>
+
+          <button
+            type="button"
+            class="confirm-delete"
+            (click)="confirmDelete()"
+          >
+            excluir
+          </button>
+        </div>
+      </div>
     </div>
   }
 
