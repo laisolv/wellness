@@ -3,41 +3,6 @@
   width: 100%;
   min-width: 0;
 
-  // Desfoque sutil na parte inferior
-  &::before {
-    content: '';
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 100px;
-    z-index: 999;
-    pointer-events: none;
-
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba(23, 23, 23, 0.025) 55%,
-      rgba(23, 23, 23, 0.07) 100%
-    );
-
-    mask-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba(0, 0, 0, 0.35) 45%,
-      black 100%
-    );
-
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba(0, 0, 0, 0.35) 45%,
-      black 100%
-    );
-  }
 }
 
 /* =================================
@@ -122,11 +87,6 @@
     cursor: pointer;
     white-space: nowrap;
     touch-action: manipulation;
-    transition:
-      color 0.2s ease,
-      background 0.2s ease,
-      border-color 0.2s ease;
-
     &:hover,
     &.active {
       color: var(--color-primary);
@@ -151,8 +111,6 @@
     cursor: pointer;
     white-space: nowrap;
     touch-action: manipulation;
-    transition: opacity 0.2s ease;
-
     &:hover {
       opacity: 0.85;
     }
@@ -182,13 +140,8 @@
   border: 1px solid var(--color-border);
   border-radius: 16px;
   background: var(--color-surface);
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease;
-
   &:hover {
     border-color: var(--color-primary);
-    background: var(--color-surface-hover);
   }
 }
 
@@ -271,10 +224,6 @@
   font-size: 20px;
   cursor: pointer;
   touch-action: manipulation;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-
   &:hover {
     background: var(--color-surface-hover);
     color: #e57373;
@@ -346,8 +295,6 @@
     color: var(--color-text);
     font-family: inherit;
     font-size: 16px;
-    transition: border-color 0.2s ease;
-
     &:focus {
       border-color: var(--color-primary);
     }
@@ -381,10 +328,6 @@
   font-size: 24px;
   cursor: pointer;
   touch-action: manipulation;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-
   &:hover {
     background: var(--color-surface-hover);
     color: var(--color-primary);
@@ -426,11 +369,6 @@
   font-size: 12px !important;
   cursor: pointer;
   touch-action: manipulation;
-  transition:
-    border-color 0.2s ease,
-    color 0.2s ease,
-    background 0.2s ease;
-
   &:hover {
     border-color: var(--color-primary);
     color: var(--color-primary);
@@ -465,10 +403,6 @@
     font-weight: 600;
     cursor: pointer;
     touch-action: manipulation;
-    transition:
-      background 0.2s ease,
-      color 0.2s ease;
-
     &:hover {
       background: var(--color-surface-hover);
       color: var(--color-text);
@@ -542,10 +476,6 @@
     font-weight: 600;
     cursor: pointer;
     touch-action: manipulation;
-    transition:
-      background 0.2s ease,
-      color 0.2s ease;
-
     &:hover {
       background: var(--color-surface-hover);
       color: var(--color-text);
@@ -711,17 +641,3 @@
   }
 }
 
-/* =================================
-   MOVIMENTO REDUZIDO
-================================= */
-
-@media (prefers-reduced-motion: reduce) {
-  .library-item,
-  .library-filters button,
-  .library-actions button,
-  .delete-item,
-  .library-form button {
-    transition: none !important;
-    animation: none !important;
-  }
-}
