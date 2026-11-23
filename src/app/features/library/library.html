@@ -5,7 +5,7 @@
       <span class="library-eyebrow">LUMA · BIBLIOTECA</span>
     </div>
 
-    <p>acompanhe seus livros, jogos e filmes!</p>
+    <p>Acompanhe seus livros, jogos e filmes!</p>
   </header>
 
   <div class="library-toolbar">
@@ -16,7 +16,7 @@
         (click)="activeFilter.set('tudo')"
         [class.active]="activeFilter() === 'tudo'"
       >
-        tudo
+        Tudo
       </button>
 
       <button
@@ -24,7 +24,7 @@
         (click)="activeFilter.set('livros')"
         [class.active]="activeFilter() === 'livros'"
       >
-        livros
+        Livros
       </button>
 
       <button
@@ -32,7 +32,7 @@
         (click)="activeFilter.set('jogos')"
         [class.active]="activeFilter() === 'jogos'"
       >
-        jogos
+        Jogos
       </button>
 
       <button
@@ -49,7 +49,7 @@
         type="button"
         (click)="formOpen.set(true)"
       >
-        + adicionar item
+        + Adicionar item
       </button>
     </div>
 
@@ -106,7 +106,7 @@
         (click)="$event.stopPropagation()"
       >
         <header class="form-header">
-          <h2 id="form-title">adicionar à biblioteca</h2>
+          <h2 id="form-title">Adicionar à biblioteca</h2>
           <button
             type="button"
             class="form-close"
@@ -116,36 +116,38 @@
         </header>
 
         <div class="form-body">
-          <label for="item-title">nome</label>
+          <label for="item-title">Nome</label>
           <input
             id="item-title"
             type="text"
-            placeholder="nome do livro, jogo ou filme"
+            placeholder="Nome do livro, jogo ou filme"
             [value]="newTitle()"
             (input)="newTitle.set($any($event.target).value)"
           />
 
           <div class="form-row">
             <div>
-              <label for="item-type">categoria</label>
+              <label for="item-type">Categoria</label>
               <select
                 id="item-type"
                 [value]="newType()"
                 (change)="newType.set($any($event.target).value)"
               >
-                <option value="livro">livro</option>
-                <option value="jogo">jogo</option>
-                <option value="filme">filme</option>
+                <option value="livro">Livro</option>
+                <option value="jogo">Jogo</option>
+                <option value="filme">Filme</option>
               </select>
             </div>
 
             <div>
-              <label for="item-rating">avaliação</label>
+              <label for="item-rating">Avaliação</label>
               <select
                 id="item-rating"
                 [value]="newRating()"
                 (change)="newRating.set(+$any($event.target).value)"
               >
+                
+                <option value=""></option>
                 <option value="5">★★★★★</option>
                 <option value="4">★★★★</option>
                 <option value="3">★★★</option>
@@ -155,10 +157,10 @@
             </div>
           </div>
 
-          <label for="item-description">suas impressões</label>
+          <label for="item-description">Suas impressões</label>
           <textarea
             id="item-description"
-            placeholder="o que você achou?"
+            placeholder="O que você achou?"
             [value]="newDescription()"
             (input)="newDescription.set($any($event.target).value)"
           ></textarea>
@@ -166,7 +168,7 @@
           <div class="form-cover">
             <label for="item-image" class="image-upload">
               <span class="upload-icon">＋</span>
-              <span>adicionar capa</span>
+              <span>Adicionar capa</span>
             </label>
 
             @if (newImage()) {
@@ -186,8 +188,8 @@
         </div>
 
         <footer class="library-form-actions">
-          <button type="button" (click)="formOpen.set(false)">cancelar</button>
-          <button type="button" (click)="addItem()">adicionar à biblioteca</button>
+          <button type="button" (click)="formOpen.set(false)">Cancelar</button>
+          <button type="button" (click)="addItem()">Adicionar à biblioteca</button>
         </footer>
       </div>
     </div>
@@ -197,16 +199,16 @@
     <div class="delete-overlay">
       <div class="delete-modal">
 
-        <h2>excluir item?</h2>
+        <h2>Excluir item?</h2>
 
-        <p>essa ação não poderá ser desfeita.</p>
+        <p>Essa ação não poderá ser desfeita.</p>
 
         <div class="delete-actions">
           <button
             type="button"
             (click)="itemToDelete.set(null)"
           >
-            cancelar
+            Cancelar
           </button>
 
           <button
@@ -214,7 +216,7 @@
             class="confirm-delete"
             (click)="confirmDelete()"
           >
-            excluir
+            Excluir
           </button>
         </div>
       </div>

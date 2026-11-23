@@ -24,7 +24,7 @@
     @if (publications().length === 0) {
       <div class="empty-feed">
         <span class="empty-decoration">✳</span>
-        <h2>seu espaço começa aqui.</h2>
+        <h2>Seu espaço começa aqui.</h2>
         <p>
           Registre pequenas coisas, grandes momentos ou simplesmente o seu dia.
         </p>
@@ -77,14 +77,14 @@
                 <button
                   type="button"
                   (click)="editPublication(post)">
-                  editar publicação
+                  Editar publicação
                 </button>
 
                 <button
                   type="button"
                   class="delete-option"
                   (click)="requestDelete(post.id)">
-                  excluir publicação
+                  Excluir publicação
                 </button>
 
               </div>
@@ -124,11 +124,11 @@
 
         <span class="modal-eyebrow">LUMA · SEU ESPAÇO</span>
 
-        <h2>excluir publicação?</h2>
+        <h2>Excluir publicação?</h2>
 
         <p>
-          tem certeza de que deseja excluir este registro?
-          essa ação não poderá ser desfeita.
+          Tem certeza de que deseja excluir este registro?
+          Essa ação não poderá ser desfeita.
         </p>
 
         <div class="modal-actions">
@@ -137,14 +137,14 @@
             type="button"
             class="cancel-delete"
             (click)="cancelDelete()">
-            cancelar
+            Cancelar
           </button>
 
           <button
             type="button"
             class="confirm-delete"
             (click)="confirmDelete()">
-            excluir
+            Excluir
           </button>
 
         </div>
