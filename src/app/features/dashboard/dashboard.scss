@@ -250,23 +250,29 @@
   }
 }
 
-// Fotografia da publicação
+/* FOTOGRAFIA DA PUBLICAÇÃO */
 
 .publication-image {
   width: 100%;
+  min-width: 0;
   overflow: hidden;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
 
   img {
     display: block;
     width: 100%;
-    border-radius: 10px;
-    max-height: 480px;
     max-height: min(480px, 70dvh);
     height: auto;
     object-fit: contain;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    border-radius: 10px;
+    background: transparent;
   }
 }
-
 // Texto da publicação
 
 .publication-content {
