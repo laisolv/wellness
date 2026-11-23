@@ -45,104 +45,6 @@
       </button>
     </div>
 
-    @if (formOpen()) {
-      <div class="library-form-overlay">
-        <div class="library-form">
-
-          <h2>adicionar à biblioteca</h2>
-
-          <button
-            type="button"
-            class="form-close"
-            (click)="formOpen.set(false)"
-            aria-label="fechar formulário"
-          >
-            ×
-          </button>
-
-          <label for="item-title">nome</label>
-          <input
-            id="item-title"
-            type="text"
-            placeholder="nome do livro, jogo ou filme"
-            [value]="newTitle()"
-            (input)="newTitle.set($any($event.target).value)"
-          />
-
-          <label for="item-type">categoria</label>
-          <select
-            id="item-type"
-            [value]="newType()"
-            (change)="newType.set($any($event.target).value)"
-          >
-            <option value="livro">livro</option>
-            <option value="jogo">jogo</option>
-            <option value="filme">filme</option>
-          </select>
-
-          <label for="item-description">suas impressões</label>
-          <textarea
-            id="item-description"
-            placeholder="o que você achou?"
-            [value]="newDescription()"
-            (input)="newDescription.set($any($event.target).value)"
-          ></textarea>
-
-          <label for="item-rating">sua avaliação</label>
-          <select
-            id="item-rating"
-            [value]="newRating()"
-            (change)="newRating.set(+$any($event.target).value)"
-          >
-            <option value="5">★★★★★</option>
-            <option value="4">★★★★</option>
-            <option value="3">★★★</option>
-            <option value="2">★★</option>
-            <option value="1">★</option>
-          </select>
-
-          <label for="item-image" class="image-upload">
-            <span class="upload-icon">＋</span>
-            <span>adicionar capa</span>
-          </label>
-
-          <input
-            id="item-image"
-            class="image-input"
-            type="file"
-            accept="image/*"
-            (change)="onImageSelected($event)"
-          />
-
-          @if (newImage()) {
-            <div class="image-preview">
-              <img
-                [src]="newImage()"
-                alt="prévia da capa selecionada"
-              />
-            </div>
-          }
-
-          <div class="library-form-actions">
-            <button
-              type="button"
-              (click)="formOpen.set(false)"
-            >
-              cancelar
-            </button>
-
-            <button
-              type="button"
-              (click)="addItem()"
-            >
-              adicionar à biblioteca
-            </button>
-          </div>
-
-        </div>
-      </div>
-    }
-
     <div class="library-actions">
       <button
         type="button"
@@ -154,10 +56,109 @@
 
   </div>
 
+  @if (formOpen()) {
+  <div class="library-form-overlay" (click)="formOpen.set(false)">
+    <div
+      class="library-form"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="form-title"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="form-header">
+        <h2 id="form-title">adicionar à biblioteca</h2>
+        <button
+          type="button"
+          class="form-close"
+          (click)="formOpen.set(false)"
+          aria-label="fechar formulário"
+        >×</button>
+      </header>
+
+      <div class="form-body">
+        <label for="item-title">nome</label>
+        <input
+          id="item-title"
+          type="text"
+          placeholder="nome do livro, jogo ou filme"
+          [value]="newTitle()"
+          (input)="newTitle.set($any($event.target).value)"
+        />
+
+        <div class="form-row">
+          <div>
+            <label for="item-type">categoria</label>
+            <select
+              id="item-type"
+              [value]="newType()"
+              (change)="newType.set($any($event.target).value)"
+            >
+              <option value="livro">livro</option>
+              <option value="jogo">jogo</option>
+              <option value="filme">filme</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="item-rating">avaliação</label>
+            <select
+              id="item-rating"
+              [value]="newRating()"
+              (change)="newRating.set(+$any($event.target).value)"
+            >
+              <option value="5">★★★★★</option>
+              <option value="4">★★★★</option>
+              <option value="3">★★★</option>
+              <option value="2">★★</option>
+              <option value="1">★</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="item-description">suas impressões</label>
+        <textarea
+          id="item-description"
+          placeholder="o que você achou?"
+          [value]="newDescription()"
+          (input)="newDescription.set($any($event.target).value)"
+        ></textarea>
+
+        <div class="form-cover">
+          <label for="item-image" class="image-upload">
+            <span class="upload-icon">＋</span>
+            <span>adicionar capa</span>
+          </label>
+
+          @if (newImage()) {
+            <div class="image-preview">
+              <img [src]="newImage()" alt="prévia da capa selecionada" />
+            </div>
+          }
+        </div>
+
+        <input
+          id="item-image"
+          class="image-input"
+          type="file"
+          accept="image/*"
+          (change)="onImageSelected($event)"
+        />
+      </div>
+
+      <footer class="library-form-actions">
+        <button type="button" (click)="formOpen.set(false)">cancelar</button>
+        <button type="button" (click)="addItem()">adicionar à biblioteca</button>
+      </footer>
+    </div>
+  </div>
+}
+
   <div class="library-content">
 
     @for (item of filteredItems(); track item.id) {
       <div class="library-item">
+
+        <span class="item-type">{{ item.type }}</span>
 
         <div class="item-cover">
           <img

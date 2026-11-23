@@ -1,59 +1,155 @@
-html,
-body {
-  margin: 0;
-  min-height: 100%;
-}
-
-:root {
-      /* cores principais - modo escuro */
-  --color-background: #171717;
-  --color-surface: #202020;
-  --color-surface-hover: #292929;
-
-  --color-primary: #C9F36B;
-  --color-text: #F5F4EF;
-  --color-text-secondary: #92928C;
-  --color-border: #383838;
-
-
-    /*espaçamentos */
-    --spacing-small: 8px;
-    --spacing-medium: 16px;
-    --spacing-large: 24px;
-
-    /*bordas*/
-    --radius-small: 8px;
-    --radius-medium: 12px;
-}
-
-
-:root[data-theme='light'] {
-    --color-background: #F5F5F0;
-    --color-surface: #FFFFFF;
-    --color-surface-hover: #EBEBE5;
-
-    --color-primary: #789D2F;
-  --color-text: #22231F;
-  --color-text-secondary: #77786F;
-  --color-border: #E1E1D9;
-
-  color-scheme: light;
-}
+/* =================================
+   RESET E BASE
+================================= */
 
 * {
   box-sizing: border-box;
 }
 
-body {
+html {
+  width: 100%;
+  min-height: 100%;
   margin: 0;
+
+  /* Evita o iOS aumentar o texto sozinho ao girar a tela */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+
+  /* Espaço para a navegação inferior flutuante + área segura */
+  padding-bottom: calc(
+    var(--nav-height) +
+    var(--nav-offset) +
+    var(--spacing-large) +
+    env(safe-area-inset-bottom)
+  );
+
+  overflow-x: hidden;
+
+  /* Evita o "efeito elástico" empurrando a navegação */
+  overscroll-behavior-y: none;
+
   background-color: var(--color-background);
+
   font-family: 'Inter', Arial, sans-serif;
   color: var(--color-text);
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
   transition:
     background-color 0.25s ease,
     color 0.25s ease;
 }
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Campos herdam a fonte do app */
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Foco visível para teclado e leitores de tela */
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* =================================
+   LUMA — SÁLVIA SOFISTICADO
+================================= */
+
+:root {
+  color-scheme: dark;
+
+  /* Cores principais — modo escuro */
+  --color-background: #141615;
+  --color-surface: #1C201D;
+  --color-surface-hover: #262C27;
+
+  --color-primary: #B8D98A;
+  --color-primary-text: #B8D98A; /* verde para texto pequeno */
+  --color-on-primary: #171717;   /* texto sobre fundo verde */
+
+  --color-text: #F0F1E9;
+  --color-text-secondary: #969D92;
+  --color-border: #343B35;
+
+  /* Avaliação */
+  --color-rating: #F5C65A;
+
+  /* Categorias */
+  --color-livro: #B8D98A;
+  --color-jogo: #B3A6F0;
+  --color-filme: #F0A98A;
+
+  /* Exclusão */
+  --color-danger: #E57373;
+  --color-danger-solid: #C96B6B;
+
+  /* Espaçamentos */
+  --spacing-small: 8px;
+  --spacing-medium: 16px;
+  --spacing-large: 24px;
+
+  /* Bordas */
+  --radius-small: 8px;
+  --radius-medium: 12px;
+
+  /* Navegação inferior */
+  --nav-items: 6;
+  --nav-height: 64px;
+  --nav-item-height: 50px;
+  --nav-offset: 16px;
+  --nav-blur: 22px;
+}
+
+/* Modo claro */
+
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-background: #F4F5EF;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #E9EDE3;
+
+  --color-primary: #789B4A;
+  --color-primary-text: #5F8236; /* contraste ≥ 4.5:1 no fundo claro */
+
+  --color-text: #252922;
+  --color-text-secondary: #777D72;
+  --color-border: #DEE4D8;
+
+  --color-rating: #E0A526;
+
+  --color-livro: #5F8236;
+  --color-jogo: #7461C9;
+  --color-filme: #C46A3F;
+
+  --color-danger: #D05A5A;
+}
+
+/* =================================
+   TRANSIÇÕES ENTRE PÁGINAS
+================================= */
 
 ::view-transition-old(app-content) {
   animation: page-out 200ms ease both;
@@ -68,7 +164,6 @@ body {
     opacity: 0;
     transform: translateY(-4px);
   }
-  
 }
 
 @keyframes page-in {
@@ -80,5 +175,363 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ========================================
+   NAVEGAÇÃO INFERIOR — LUMA
+======================================== */
+
+.navigation {
+  position: fixed;
+  z-index: 1000;
+
+  left: 50%;
+  bottom: calc(var(--nav-offset) + env(safe-area-inset-bottom));
+
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: min(420px, calc(100vw - 32px));
+  min-height: var(--nav-height);
+  padding: 7px;
+
+  box-sizing: border-box;
+
+  background: color-mix(
+    in srgb,
+    var(--color-surface) 48%,
+    transparent
+  );
+
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+
+  backdrop-filter: blur(var(--nav-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(160%);
+
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    opacity 200ms ease,
+    visibility 200ms ease;
+
+  .navigation-brand,
+  .navigation-footer {
+    display: none;
+  }
+
+  .navigation-links {
+    position: relative;
+    isolation: isolate;
+    z-index: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    width: 100%;
+    min-width: 0;
+  }
+
+  a,
+  .theme-toggle {
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    flex: 1 1 0;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 0;
+    min-height: var(--nav-item-height);
+
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+
+    background: transparent;
+    color: var(--color-text-secondary);
+
+    text-decoration: none;
+    cursor: pointer;
+
+    pointer-events: auto;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+
+    transition:
+      color 400ms ease,
+      transform 300ms ease;
+
+    span {
+      display: none;
+    }
+
+    svg {
+      display: block;
+      flex-shrink: 0;
+
+      width: 22px;
+      height: 22px;
+
+      stroke-width: 1.8;
+      pointer-events: none;
+
+      transition:
+        transform 400ms ease,
+        filter 400ms ease;
+    }
+
+    &:active {
+      transform: scale(0.90);
+    }
+  }
+
+  /* Hover só em dispositivos com mouse (evita "hover preso" no toque) */
+
+  @media (hover: hover) and (pointer: fine) {
+    a:hover,
+    .theme-toggle:hover {
+      color: var(--color-text);
+    }
+  }
+
+  a.active {
+    color: var(--color-primary-text);
+
+    svg {
+      filter: drop-shadow(
+        0 0 5px color-mix(
+          in srgb,
+          var(--color-primary) 30%,
+          transparent
+        )
+      );
+    }
+  }
+
+  .theme-toggle {
+    font: inherit;
+  }
+
+  /* Indicador de vidro */
+
+  .glass-indicator {
+    position: absolute;
+    z-index: 0;
+
+    top: 0;
+    left: 0;
+
+    width: calc(100% / var(--nav-items));
+    height: var(--nav-item-height);
+
+    pointer-events: none;
+
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 999px;
+
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.22),
+      rgba(255, 255, 255, 0.08) 45%,
+      rgba(255, 255, 255, 0.035)
+    );
+
+    backdrop-filter: blur(var(--nav-blur)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(180%);
+
+    box-shadow:
+      inset 0 1px 2px rgba(255, 255, 255, 0.30),
+      inset 0 -1px 2px rgba(255, 255, 255, 0.07),
+      0 4px 16px rgba(0, 0, 0, 0.10);
+
+    transform:
+      translateX(calc(var(--glass-index, 0) * 100%))
+      scaleX(var(--glass-stretch, 1));
+
+    transform-origin: var(--glass-origin, center center);
+
+    transition:
+      transform 850ms cubic-bezier(0.22, 1, 0.36, 1);
+
+    will-change: transform;
+
+    &::before {
+      content: '';
+      position: absolute;
+
+      top: 1px;
+      left: 15%;
+      right: 15%;
+
+      height: 1px;
+
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.45);
+
+      filter: blur(1px);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+
+      inset: 0;
+
+      border-radius: inherit;
+
+      background: radial-gradient(
+        ellipse at 30% 0%,
+        rgba(255, 255, 255, 0.16),
+        transparent 65%
+      );
+
+      pointer-events: none;
+    }
+  }
+}
+
+/* Esconde a navegação quando há modal aberto (formulário, confirmação de exclusão).
+   display: none tira o elemento da renderização, junto com o backdrop-filter.
+   Para incluir outro modal, basta adicionar a classe dele na lista do :has() */
+
+body:has(.library-form-overlay, .delete-overlay) .navigation {
+  display: none;
+}
+
+/* Navegadores sem backdrop-filter: fundo mais opaco para manter a leitura */
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .navigation {
+    background: var(--color-surface);
+  }
+}
+
+/* =================================
+   TABLETS E TELAS MÉDIAS
+================================= */
+
+@media (max-width: 768px) {
+  :root {
+    /* Blur menor = menos custo de GPU em aparelhos mais simples */
+    --nav-blur: 16px;
+  }
+}
+
+/* =================================
+   CELULARES
+================================= */
+
+@media (max-width: 560px) {
+  :root {
+    --nav-height: 68px;
+    --nav-item-height: 52px;
+    --nav-offset: 10px;
+  }
+
+  /* Evita o zoom automático do iOS ao focar em campos */
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  .navigation {
+    z-index: 9999;
+
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+
+    width: auto;
+
+    transform: none;
+
+    padding: 8px 5px;
+
+    .navigation-links {
+      width: 100%;
+    }
+
+    a,
+    .theme-toggle {
+      svg {
+        width: 23px;
+        height: 23px;
+      }
+    }
+  }
+}
+
+/* =================================
+   CELULARES ESTREITOS
+================================= */
+
+@media (max-width: 360px) {
+  :root {
+    --nav-item-height: 50px;
+  }
+
+  .navigation {
+    left: max(7px, env(safe-area-inset-left));
+    right: max(7px, env(safe-area-inset-right));
+
+    padding: 7px 3px;
+
+    a,
+    .theme-toggle {
+      svg {
+        width: 21px;
+        height: 21px;
+      }
+    }
+  }
+}
+
+/* =================================
+   CELULAR NA HORIZONTAL
+================================= */
+
+@media (max-height: 480px) and (orientation: landscape) {
+  :root {
+    --nav-height: 54px;
+    --nav-item-height: 42px;
+    --nav-offset: 6px;
+  }
+
+  .navigation {
+    padding: 5px;
+  }
+}
+
+/* =================================
+   ACESSIBILIDADE
+================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  ::view-transition-old(app-content),
+  ::view-transition-new(app-content) {
+    animation: none !important;
   }
 }

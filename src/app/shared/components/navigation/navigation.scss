@@ -1,15 +1,23 @@
-
 :host {
   display: block;
 
-  // Desfoque na parte inferior do celular
+  // Desfoque na parte inferior da tela (atrás da navegação)
   &::before {
     content: '';
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    height: 120px;
+
+    // Cobre a navegação + um respiro acima dela (variáveis vêm do style.scss global)
+    height: calc(
+      var(--nav-height) +
+      var(--nav-offset) +
+      var(--spacing-large) +
+      var(--spacing-medium) +
+      env(safe-area-inset-bottom)
+    );
+
     z-index: 999;
     pointer-events: none;
 
@@ -32,140 +40,5 @@
   }
 }
 
-// Navegação inferior
-
-.navigation {
-  position: fixed;
-  bottom: calc(16px + env(safe-area-inset-bottom));
-  left: 16px;
-  right: 16px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-
-  padding: 7px;
-
-  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-
-  z-index: 1000;
-
-  .navigation-brand,
-  .navigation-footer {
-    display: none;
-  }
-
-  .navigation-links {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-  }
-
-  a,
-  .theme-toggle {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-
-    height: 48px;
-    border-radius: 999px;
-
-    color: var(--color-text-secondary);
-    text-decoration: none;
-
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease,
-      transform 0.2s ease;
-
-    span {
-      display: none;
-    }
-
-    svg {
-      width: 22px;
-      height: 22px;
-      stroke-width: 1.8;
-    }
-
-    &:hover {
-      color: var(--color-primary);
-      background: var(--color-surface-hover);
-    }
-
-    &:active {
-      transform: scale(0.92);
-    }
-  }
-
-  a.active {
-    background: var(--color-surface-hover);
-    color: var(--color-primary);
-  }
-
-  .theme-toggle {
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font: inherit;
-  }
-
-  svg {
-    transition: transform 0.4s ease;
-  }
-
-}
-
-// Navegação no computador
-
-@media (min-width: 768px) {
-  .navigation {
-    top: auto;
-    bottom: calc(16px + env(safe-area-inset-bottom));
-
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-
-    width: min(420px, calc(100% - 32px));
-    height: auto;
-
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-
-    padding: 7px;
-    gap: 0;
-
-    .navigation-brand,
-    .navigation-footer {
-      display: none;
-    }
-
-    .navigation-links {
-      width: 100%;
-      flex-direction: row;
-      justify-content: space-around;
-      gap: 0;
-    }
-
-    a,
-    .theme-toggle {
-      flex: 1;
-      width: auto;
-      height: 48px;
-
-      justify-content: center;
-
-      span {
-        display: none;
-      }
-    }
-  }
-}
+// A navegação inferior (.navigation, .glass-indicator, hover, tema claro/escuro,
+// celulares, área segura) agora fica somente no style.scss global.
