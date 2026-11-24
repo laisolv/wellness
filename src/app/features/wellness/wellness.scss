@@ -14,6 +14,28 @@
 }
 
 // ========================================
+// IDENTIDADE E TEXTOS
+// ========================================
+
+.wellness-eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  line-height: 1.4;
+}
+
+.highlight-eyebrow {
+  display: block;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+}
+
+// ========================================
 // CABEÇALHO
 // ========================================
 
@@ -21,12 +43,7 @@
   margin-bottom: 32px;
 
   .wellness-eyebrow {
-    display: block;
     margin-bottom: 10px;
-    color: var(--color-primary);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.8px;
   }
 
   h1 {
@@ -101,7 +118,7 @@
   border-radius: 18px;
   background:
     radial-gradient(
-      circle at 90% 15%,
+      circle at 9% 15%,
       rgba(184, 217, 138, 0.14),
       transparent 38%
     ),
@@ -129,6 +146,9 @@
   }
 
   button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
     padding: 11px 17px;
     border: 0;
     border-radius: 9px;
@@ -140,6 +160,11 @@
     transition:
       transform 0.25s ease,
       opacity 0.25s ease;
+
+    span {
+      font-size: 18px;
+      line-height: 1;
+    }
 
     &:hover {
       transform: translateY(-2px);
@@ -216,16 +241,27 @@
 }
 
 .day-indicator {
+  display: grid;
+  place-items: center;
   width: 9px;
   height: 9px;
   border: 1px solid var(--color-border);
   border-radius: 50%;
 
   &.active {
+    width: 19px;
+    height: 19px;
     border-color: var(--color-primary);
     background: var(--color-primary);
     box-shadow: 0 0 12px rgba(184, 217, 138, 0.3);
   }
+}
+
+.week-day-check {
+  color: var(--color-on-primary);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 // ========================================
@@ -313,15 +349,26 @@
 }
 
 .history-icon {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: rgba(184, 217, 138, 0.1);
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  border-radius: 15px;
+  background: color-mix(
+    in srgb,
+    var(--color-primary) 13%,
+    var(--color-surface)
+  );
   color: var(--color-primary);
-  font-size: 21px;
+
+  svg {
+    width: 22px;
+    height: 22px;
+    stroke-width: 1.8;
+  }
 }
 
 .history-info {
@@ -363,14 +410,21 @@
     place-items: center;
     width: 34px;
     height: 34px;
+    padding: 0;
     border: 1px solid var(--color-border);
     border-radius: 9px;
     background: transparent;
-    font-size: 17px;
     cursor: pointer;
     transition:
       background 0.2s ease,
-      color 0.2s ease;
+      color 0.2s ease,
+      border-color 0.2s ease;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 1.9;
+    }
 
     &:hover {
       background: var(--color-surface-hover);
@@ -379,12 +433,17 @@
 
   .edit-action {
     color: var(--color-primary);
+
+    &:hover {
+      border-color: var(--color-primary);
+    }
   }
 
   .delete-action {
     color: var(--color-danger);
 
     &:hover {
+      border-color: var(--color-danger);
       background: rgba(217, 130, 130, 0.1);
     }
   }
@@ -415,6 +474,7 @@
   small {
     color: var(--color-text-secondary);
     font-size: 11px;
+    line-height: 1.6;
   }
 }
 
@@ -442,12 +502,21 @@
   width: 100%;
   max-width: 480px;
   max-height: 88dvh;
+  min-height: 0;
   overflow: hidden;
   border: 1px solid var(--color-border);
   border-radius: 18px;
   background: var(--color-surface);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
   animation: wellnessModalIn 0.3s ease;
+
+  > form {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    flex: 1;
+  }
 }
 
 .modal-header {
@@ -471,15 +540,20 @@
   flex-shrink: 0;
   width: 36px;
   height: 36px;
+  padding: 0;
   border: 1px solid var(--color-border);
   border-radius: 50%;
   background: transparent;
   color: var(--color-text-secondary);
-  font-size: 23px;
   cursor: pointer;
   transition:
     background 0.2s ease,
     color 0.2s ease;
+
+  svg {
+    width: 17px;
+    height: 17px;
+  }
 
   &:hover {
     background: var(--color-surface-hover);
@@ -491,6 +565,8 @@
   display: flex;
   flex-direction: column;
   gap: 9px;
+  flex: 1;
+  min-height: 0;
   padding: 22px 24px;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -592,6 +668,7 @@
 }
 
 .delete-modal {
+  position: relative;
   width: 100%;
   max-width: 370px;
   padding: 28px;
@@ -601,6 +678,12 @@
   text-align: center;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
   animation: wellnessModalIn 0.3s ease;
+
+  > .modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+  }
 
   h2 {
     margin: 12px 0 9px;
@@ -617,16 +700,25 @@
 }
 
 .delete-icon {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   width: 46px;
   height: 46px;
   margin: 0 auto 17px;
+
   border-radius: 14px;
   background: rgba(217, 130, 130, 0.12);
   color: var(--color-danger);
-  font-size: 23px;
-  font-weight: 700;
+
+  svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    stroke-width: 1.9;
+  }
 }
 
 .delete-actions {
@@ -805,10 +897,10 @@
 
   .modal-footer {
     padding: 13px 18px calc(13px + env(safe-area-inset-bottom));
-  }
 
-  .modal-footer button {
-    flex: 1;
+    button {
+      flex: 1;
+    }
   }
 }
 
@@ -819,6 +911,26 @@
 
   .delete-actions {
     flex-direction: column;
+  }
+
+  .history-item {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .history-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+
+  .history-actions {
+    gap: 4px;
+
+    button {
+      width: 28px;
+      height: 28px;
+    }
   }
 }
 

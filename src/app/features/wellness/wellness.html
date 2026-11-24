@@ -11,89 +11,101 @@
 
   <section class="wellness-highlight">
     <div class="highlight-content">
-      <span class="section-label">UM PASSO DE CADA VEZ</span>
-      <h2>Como você quer se sentir hoje?</h2>
-      <p>Pequenos movimentos também fazem parte de uma grande mudança.</p>
-      <button type="button" (click)="openForm()">
+      <span class="highlight-eyebrow">SEU MOVIMENTO IMPORTA</span>
+      <h2>Um passo de cada vez.</h2>
+      <p>
+        Registre suas atividades e acompanhe sua evolução
+        respeitando o seu próprio ritmo.
+      </p>
+      <button
+        type="button"
+        class="wellness-add-button"
+        (click)="openForm()"
+      >
+        <span>+</span>
         Registrar atividade
       </button>
     </div>
-
- 
   </section>
 
   <section class="wellness-week">
     <div class="section-heading">
       <div>
-        <span class="section-label">SUA ROTINA</span>
-        <h2>Esta semana</h2>
+        <span class="wellness-eyebrow">CONSTÂNCIA</span>
+        <h2>Sua semana</h2>
       </div>
-      <span class="week-caption">Seu ritmo, seu tempo</span>
     </div>
 
     <div class="week-days">
-      @for (day of weekDays; track day.date) {
+      @for (day of weekDays; track day.label) {
         <div class="day">
           <span>{{ day.label }}</span>
 
-          <span
-          class="day-indicator"
-          [class.active]="isDayActive(day.date)"
+          <div
+            class="day-indicator"
+            [class.active]="isDayActive(day.date)"
           >
-
-          </span>
+            @if (isDayActive(day.date)) {
+              <span class="week-day-check">✓</span>
+            }
+          </div>
         </div>
       }
-
-
-      </div>
-  </section>
-
-  <section class="wellness-activities">
-    <div class="section-heading">
-      <div>
-        <span class="section-label">MOVIMENTO</span>
-        <h2>Seu corpo em movimento</h2>
-      </div>
-    </div>
-
-    <div class="activity-grid">
-      <article class="activity-item">
-        <span class="activity-icon">↗</span>
-        <h3>Treinos</h3>
-        <p>Registre suas atividades e acompanhe sua evolução.</p>
-      </article>
-
-      <article class="activity-item">
-        <span class="activity-icon">♡</span>
-        <h3>Equilíbrio</h3>
-        <p>Encontre espaço para pausas, descanso e autocuidado.</p>
-      </article>
     </div>
   </section>
 
   <section class="wellness-history">
-
     <div class="section-heading">
       <div>
-        <span class="section-label">ACOMPANHAMENTO</span>
-        <h2>Suas atividades</h2>
+        <span class="wellness-eyebrow">SEU CAMINHO</span>
+        <h2>Histórico de atividades</h2>
       </div>
 
       <span class="history-count">
         {{ activities.length }}
-        {{ activities.length === 1 ? 'registro' : 'registros' }}
+        {{ activities.length === 1 ? 'atividade' : 'atividades' }}
       </span>
     </div>
 
-    @if (activities.length > 0) {
-
+    @if (activities.length === 0) {
+      <div class="history-empty">
+        <span class="empty-icon">✳</span>
+        <p>Seu movimento começa aqui</p>
+        <small>
+          Registre sua primeira atividade e comece a acompanhar
+          seus momentos de cuidado.
+        </small>
+      </div>
+    } @else {
       <div class="history-list">
-
         @for (item of activities; track item.id) {
           <article class="history-item">
 
-            <div class="history-icon">↗</div>
+            <div class="history-icon">
+              @switch (getActivityIcon(item.activityType)) {
+                @case ('dumbbell') {
+                  <svg lucideDumbbell></svg>
+                }
+                @case ('footprints') {
+                  <svg lucideFootprints></svg>
+                }
+                @case ('bike') {
+                  <svg lucideBike></svg>
+                }
+                @case ('flower') {
+                  <svg lucideFlower2></svg>
+                }
+                @case ('shield') {
+                  <svg lucideShield></svg>
+                }
+                @case ('activity') {
+                  <svg lucideActivity></svg>
+                }
+                @default {
+                  <svg lucideSparkles></svg>
+                }
+              }
+            </div>
 
             <div class="history-info">
               <h3>{{ item.activityType }}</h3>
@@ -111,14 +123,14 @@
             </div>
 
             <div class="history-actions">
-
               <button
                 type="button"
                 class="edit-action"
                 (click)="editActivity(item)"
                 aria-label="Editar atividade"
+                title="Editar atividade"
               >
-                ✎
+                <svg lucidePencil></svg>
               </button>
 
               <button
@@ -126,41 +138,149 @@
                 class="delete-action"
                 (click)="deleteActivity(item.id!)"
                 aria-label="Excluir atividade"
+                title="Excluir atividade"
               >
-                ×
+                <svg lucideTrash2></svg>
               </button>
-
             </div>
+
           </article>
         }
-
       </div>
-
-    } @else {
-
-      <div class="history-empty">
-        <span>✳</span>
-        <p>Suas atividades aparecerão aqui.</p>
-        <small>Cada pequeno movimento merece ser registrado.</small>
-      </div>
-
     }
-
   </section>
 
-  <!-- Confirmação de exclusão -->
+  @if (showForm) {
+    <div
+      class="wellness-modal-overlay"
+      (click)="closeForm()"
+    >
+      <div
+        class="wellness-modal"
+        (click)="$event.stopPropagation()"
+      >
+
+        <div class="modal-header">
+          <div>
+            <span class="wellness-eyebrow">SEU CUIDADO</span>
+            <h2>
+              {{ activity.id ? 'Editar atividade' : 'Nova atividade' }}
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            class="modal-close"
+            (click)="closeForm()"
+            aria-label="Fechar"
+          >
+            <svg lucideX></svg>
+          </button>
+        </div>
+
+        <form (ngSubmit)="savedActivity()">
+
+          <div class="modal-body">
+
+            <label for="activityType">Atividade</label>
+
+            <select
+              id="activityType"
+              name="activityType"
+              [(ngModel)]="activity.activityType"
+              required
+            >
+              <option value="" disabled>
+                Selecione uma atividade
+              </option>
+              <option value="Musculação">Musculação</option>
+              <option value="Corrida">Corrida</option>
+              <option value="Caminhada">Caminhada</option>
+              <option value="Bicicleta">Bicicleta</option>
+              <option value="Yoga">Yoga</option>
+              <option value="Pilates">Pilates</option>
+              <option value="Jiu-Jitsu">Jiu-Jitsu</option>
+              <option value="Funcional">Funcional</option>
+              <option value="Outro">Outro</option>
+            </select>
+
+            <label for="activityDate">Data</label>
+            <input
+              type="date"
+              id="activityDate"
+              name="date"
+              [(ngModel)]="activity.date"
+              required
+            />
+
+            <label for="duration">Duração (min)</label>
+            <input
+              type="number"
+              id="duration"
+              name="durationMinutes"
+              [(ngModel)]="activity.durationMinutes"
+              min="1"
+              required
+            />
+
+            <label for="notes">Observações</label>
+            <textarea
+              id="notes"
+              name="notes"
+              [(ngModel)]="activity.notes"
+              placeholder="Como foi esse momento?"
+              rows="3"
+            ></textarea>
+
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="cancel-button"
+              (click)="closeForm()"
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="submit"
+              class="save-button"
+              [disabled]="isSaving"
+            >
+              {{ isSaving ? 'Salvando...' : 'Salvar atividade' }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  }
+
   @if (activityToDelete !== null) {
-
-    <div class="delete-overlay" (click)="cancelDelete()">
-
+    <div
+      class="delete-overlay"
+      (click)="cancelDelete()"
+    >
       <div
         class="delete-modal"
         (click)="$event.stopPropagation()"
       >
 
-        <div class="delete-icon">!</div>
+        <button
+          type="button"
+          class="modal-close"
+          (click)="cancelDelete()"
+          aria-label="Fechar"
+        >
+          <svg lucideX></svg>
+        </button>
 
-        <span class="section-label">CONFIRMAÇÃO</span>
+        <div class="delete-icon">
+      <svg lucideTrash></svg>
+        </div>
+
+        <span class="wellness-eyebrow">CONFIRMAÇÃO</span>
         <h2>Excluir atividade?</h2>
 
         <p>
@@ -169,13 +289,12 @@
         </p>
 
         <div class="delete-actions">
-
           <button
             type="button"
             class="delete-cancel"
             (click)="cancelDelete()"
           >
-            Manter atividade
+            Cancelar
           </button>
 
           <button
@@ -186,114 +305,10 @@
           >
             {{ isDeleting ? 'Excluindo...' : 'Excluir' }}
           </button>
-
         </div>
 
       </div>
     </div>
-
-  }
-
-  <!-- Formulário de atividade -->
-  @if (showForm) {
-
-    <div class="wellness-modal-overlay" (click)="closeForm()">
-
-      <div
-        class="wellness-modal"
-        (click)="$event.stopPropagation()"
-      >
-
-        <header class="modal-header">
-          <div>
-            <span class="section-label">SUA JORNADA</span>
-            <h2>
-              {{ activity.id !== undefined ? 'Editar atividade' : 'Registrar atividade' }}
-            </h2>
-          </div>
-
-          <button
-            type="button"
-            class="modal-close"
-            (click)="closeForm()"
-            aria-label="Fechar"
-          >
-            ×
-          </button>
-        </header>
-
-        <div class="modal-body">
-
-          <label for="activityType">Tipo de atividade</label>
-
-          <select
-            id="activityType"
-            [(ngModel)]="activity.activityType"
-          >
-            <option value="">Escolha uma atividade</option>
-            <option value="Musculação">Musculação</option>
-            <option value="Corrida">Corrida</option>
-            <option value="Caminhada">Caminhada</option>
-            <option value="Bicicleta">Bicicleta</option>
-            <option value="Yoga">Yoga</option>
-            <option value="Pilates">Pilates</option>
-            <option value="Jiu-Jitsu">Jiu-Jitsu</option>
-            <option value="Funcional">Funcional</option>
-            <option value="Outro">Outro</option>
-          </select>
-
-          <label for="activityDate">Data</label>
-
-          <input
-            id="activityDate"
-            type="date"
-            [(ngModel)]="activity.date"
-          />
-
-          <label for="activityDuration">Duração (minutos)</label>
-
-          <input
-            id="activityDuration"
-            type="number"
-            min="1"
-            [(ngModel)]="activity.durationMinutes"
-          />
-
-          <label for="activityNotes">Observações (opcional)</label>
-
-          <textarea
-            id="activityNotes"
-            rows="3"
-            placeholder="Como foi sua atividade?"
-            [(ngModel)]="activity.notes"
-          ></textarea>
-
-        </div>
-
-        <footer class="modal-footer">
-
-          <button
-            type="button"
-            class="cancel-button"
-            (click)="closeForm()"
-          >
-            Cancelar
-          </button>
-
-          <button
-            type="button"
-            class="save-button"
-            [disabled]="isSaving"
-            (click)="savedActivity()"
-          >
-            {{ isSaving ? 'Salvando...' : 'Salvar atividade' }}
-          </button>
-
-        </footer>
-
-      </div>
-    </div>
-
   }
 
 </section>

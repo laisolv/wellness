@@ -3,13 +3,39 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 
+import {
+  LucideDumbbell,
+  LucideFootprints,
+  LucideBike,
+  LucideFlower2,
+  LucideShield,
+  LucideActivity,
+  LucideSparkles,
+  LucidePencil,
+  LucideTrash,
+  LucideX 
+} from '@lucide/angular';
+
 import { WellnessService } from '../../core/services/wellness.service';
 import { WellnessActivity } from '../../core/models/wellness-activity';
 
 @Component({
   standalone: true,
-  imports: [FormsModule, DatePipe],
   selector: 'app-wellness',
+  imports: [
+    FormsModule,
+    DatePipe,
+    LucideDumbbell,
+    LucideFootprints,
+    LucideBike,
+    LucideFlower2,
+    LucideShield,
+    LucideActivity,
+    LucideSparkles,
+    LucidePencil,
+    LucideTrash,
+    LucideX 
+  ],
   styleUrl: './wellness.scss',
   templateUrl: './wellness.html',
 })
@@ -23,28 +49,7 @@ export class Wellness {
     { label: 'SEX', date: 5 },
     { label: 'SÁB', date: 6 },
     { label: 'DOM', date: 0 },
-
   ];
-
-  isDayActive(day: number): boolean {
-  const today = new Date();
-  const currentDay = today.getDay();
-
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - ((currentDay + 6) % 7));
-  monday.setHours(0, 0, 0, 0);
-
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-  sunday.setHours(23, 59, 59, 999);
-
-  return this.activities.some(item => {
-    const activityDate = new Date(`${item.date}T12:00:00`);
-    return activityDate >= monday &&
-      activityDate <= sunday &&
-      activityDate.getDay() === day;
-  });
-}
 
   showForm = false;
 
@@ -79,8 +84,58 @@ export class Wellness {
     };
   }
 
-  // Carregar atividades
-  loadActivities() {
+  getActivityIcon(activityType: string): string {
+    const type = activityType.trim().toLowerCase();
+
+    switch (type) {
+      case 'musculação':
+      case 'musculacao':
+        return 'dumbbell';
+
+      case 'corrida':
+      case 'caminhada':
+        return 'footprints';
+
+      case 'bicicleta':
+        return 'bike';
+
+      case 'yoga':
+      case 'pilates':
+        return 'flower';
+
+      case 'jiu-jitsu':
+        return 'shield';
+
+      case 'funcional':
+        return 'activity';
+
+      default:
+        return 'sparkles';
+    }
+  }
+
+  isDayActive(day: number): boolean {
+    const today = new Date();
+    const currentDay = today.getDay();
+
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - ((currentDay + 6) % 7));
+    monday.setHours(0, 0, 0, 0);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+
+    return this.activities.some(item => {
+      const activityDate = new Date(`${item.date}T12:00:00`);
+
+      return activityDate >= monday &&
+        activityDate <= sunday &&
+        activityDate.getDay() === day;
+    });
+  }
+
+  loadActivities(): void {
     this.wellnessService.getAll()
       .then(activities => {
         this.activities = activities;
@@ -91,36 +146,30 @@ export class Wellness {
       });
   }
 
-  // Abrir formulário
-  openForm() {
+  openForm(): void {
     this.activity = this.createEmptyActivity();
     this.showForm = true;
   }
 
-  // Editar atividade
-  editActivity(item: WellnessActivity) {
+  editActivity(item: WellnessActivity): void {
     this.activity = { ...item };
     this.showForm = true;
   }
 
-  // Solicitar exclusão
-  deleteActivity(id: number) {
+  deleteActivity(id: number): void {
     this.activityToDelete = id;
   }
 
-  // Cancelar exclusão
-  cancelDelete() {
+  cancelDelete(): void {
     this.activityToDelete = null;
   }
 
-  // Confirmar exclusão
-  confirmDelete() {
+  confirmDelete(): void {
     if (this.activityToDelete === null || this.isDeleting) {
       return;
     }
 
     const id = this.activityToDelete;
-
     this.isDeleting = true;
 
     this.wellnessService.delete(id)
@@ -140,13 +189,11 @@ export class Wellness {
       });
   }
 
-  // Fechar formulário
-  closeForm() {
+  closeForm(): void {
     this.showForm = false;
   }
 
-  // Salvar ou atualizar atividade
-  savedActivity() {
+  savedActivity(): void {
     if (this.isSaving) {
       return;
     }

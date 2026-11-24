@@ -1,3 +1,4 @@
+
 /* =================================
    RESET E BASE
 ================================= */
@@ -11,7 +12,6 @@ html {
   min-height: 100%;
   margin: 0;
 
-  /* Evita o iOS aumentar o texto sozinho ao girar a tela */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 
@@ -24,7 +24,6 @@ body {
   min-height: 100dvh;
   margin: 0;
 
-  /* Espaço para a navegação inferior flutuante + área segura */
   padding-bottom: calc(
     var(--nav-height) +
     var(--nav-offset) +
@@ -33,8 +32,6 @@ body {
   );
 
   overflow-x: hidden;
-
-  /* Evita o "efeito elástico" empurrando a navegação */
   overscroll-behavior-y: none;
 
   background-color: var(--color-background);
@@ -86,8 +83,8 @@ textarea {
   --color-surface-hover: #262C27;
 
   --color-primary: #B8D98A;
-  --color-primary-text: #B8D98A; /* verde para texto pequeno */
-  --color-on-primary: #171717;   /* texto sobre fundo verde */
+  --color-primary-text: #B8D98A;
+  --color-on-primary: #171717;
 
   --color-text: #F0F1E9;
   --color-text-secondary: #969D92;
@@ -122,7 +119,9 @@ textarea {
   --nav-blur: 22px;
 }
 
-/* Modo claro */
+/* =================================
+   MODO CLARO
+================================= */
 
 :root[data-theme='light'] {
   color-scheme: light;
@@ -132,7 +131,7 @@ textarea {
   --color-surface-hover: #E9EDE3;
 
   --color-primary: #789B4A;
-  --color-primary-text: #5F8236; /* contraste ≥ 4.5:1 no fundo claro */
+  --color-primary-text: #5F8236;
 
   --color-text: #252922;
   --color-text-secondary: #777D72;
@@ -235,10 +234,12 @@ textarea {
 
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
 
     width: 100%;
     min-width: 0;
+
+    touch-action: pan-y;
   }
 
   a,
@@ -266,10 +267,13 @@ textarea {
     cursor: pointer;
 
     pointer-events: auto;
-    touch-action: manipulation;
+    touch-action: pan-y;
+
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
+
     user-select: none;
+    -webkit-user-select: none;
 
     transition:
       color 400ms ease,
@@ -290,9 +294,9 @@ textarea {
       pointer-events: none;
 
       transition:
-         color 350ms ease,
-         transform 350ms cubic-bezier(0.22, 1, 0.36, 1),
-         opacity 350ms ease;
+        color 350ms ease,
+        transform 350ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 350ms ease;
     }
 
     &:active {
@@ -301,7 +305,7 @@ textarea {
     }
   }
 
-  /* Hover só em dispositivos com mouse (evita "hover preso" no toque) */
+  /* Hover somente em dispositivos com mouse */
 
   @media (hover: hover) and (pointer: fine) {
     a:hover,
@@ -367,7 +371,7 @@ textarea {
     transform-origin: var(--glass-origin, center center);
 
     transition:
-  transform 750ms cubic-bezier(0.22, 1, 0.36, 1);
+      transform 750ms cubic-bezier(0.22, 1, 0.36, 1);
 
     will-change: transform;
 
@@ -406,45 +410,43 @@ textarea {
   }
 }
 
-/* Esconde a navegação quando há modal aberto (formulário, confirmação de exclusão).
-   display: none tira o elemento da renderização, junto com o backdrop-filter.
-   Para incluir outro modal, basta adicionar a classe dele na lista do :has() */
+/* Esconde a navegação quando há modal aberto */
 
 body:has(.library-form-overlay, .delete-overlay) .navigation {
   display: none;
 }
 
-/* Navegadores sem backdrop-filter: fundo mais opaco para manter a leitura */
+/* Navegadores sem backdrop-filter */
 
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+@supports not (
+  (backdrop-filter: blur(1px)) or
+  (-webkit-backdrop-filter: blur(1px))
+) {
   .navigation {
     background: var(--color-surface);
   }
 }
 
-/* =================================
+/* ========================================
    TABLETS E TELAS MÉDIAS
-================================= */
+======================================== */
 
 @media (max-width: 768px) {
   :root {
-    /* Blur menor = menos custo de GPU em aparelhos mais simples */
     --nav-blur: 16px;
   }
 }
 
-/* =================================
+/* ========================================
    CELULARES
-================================= */
+======================================== */
 
 @media (max-width: 560px) {
   :root {
-    --nav-height: 68px;
-    --nav-item-height: 52px;
+    --nav-height: 72px;
+    --nav-item-height: 56px;
     --nav-offset: 10px;
   }
-
-  /* Evita o zoom automático do iOS ao focar em campos */
 
   input,
   select,
@@ -459,7 +461,6 @@ body:has(.library-form-overlay, .delete-overlay) .navigation {
     right: max(10px, env(safe-area-inset-right));
 
     width: auto;
-
     transform: none;
 
     padding: 8px 5px;
@@ -470,6 +471,8 @@ body:has(.library-form-overlay, .delete-overlay) .navigation {
 
     a,
     .theme-toggle {
+      min-height: var(--nav-item-height);
+
       svg {
         width: 23px;
         height: 23px;
@@ -478,13 +481,13 @@ body:has(.library-form-overlay, .delete-overlay) .navigation {
   }
 }
 
-/* =================================
+/* ========================================
    CELULARES ESTREITOS
-================================= */
+======================================== */
 
 @media (max-width: 360px) {
   :root {
-    --nav-item-height: 50px;
+    --nav-item-height: 52px;
   }
 
   .navigation {
@@ -503,9 +506,9 @@ body:has(.library-form-overlay, .delete-overlay) .navigation {
   }
 }
 
-/* =================================
+/* ========================================
    CELULAR NA HORIZONTAL
-================================= */
+======================================== */
 
 @media (max-height: 480px) and (orientation: landscape) {
   :root {
@@ -519,9 +522,9 @@ body:has(.library-form-overlay, .delete-overlay) .navigation {
   }
 }
 
-/* =================================
+/* ========================================
    ACESSIBILIDADE
-================================= */
+======================================== */
 
 @media (prefers-reduced-motion: reduce) {
   *,
