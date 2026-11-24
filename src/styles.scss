@@ -456,7 +456,7 @@ router-outlet + * {
 
 /* Esconde a navegação quando há modal aberto */
 
-body:has(.library-form-overlay, .delete-overlay) .navigation {
+body:has(.library-form-overlay, .delete-overlay, .wellness-modal-overlay) .navigation {
   display: none;
 }
 
