@@ -952,3 +952,45 @@
     animation: none !important;
   }
 }
+
+@media (max-width: 650px) {
+  .wellness-modal {
+    width: 100%;
+    max-width: 420px;
+    max-height: 80dvh;
+  }
+
+  .modal-header {
+    padding: 15px 18px;
+  }
+
+  .modal-body {
+    gap: 6px;
+    padding: 12px 18px;
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    input[type="date"] {
+      display: block;
+      min-width: 0;
+      max-width: 100%;
+      padding-right: 8px;
+      font-size: 12px;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .modal-footer {
+    padding: 12px 18px;
+  }
+}

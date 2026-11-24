@@ -1,5 +1,6 @@
-
 import { Injectable, signal } from '@angular/core';
+
+const STORAGE_KEY = 'luma-theme';
 
 @Injectable({
   providedIn: 'root'
@@ -9,9 +10,7 @@ export class ThemeService {
   readonly isDarkMode = signal(true);
 
   constructor() {
-    const savedTheme = localStorage.getItem('luma-theme');
-
-    this.isDarkMode.set(savedTheme !== 'light');
+    this.isDarkMode.set(this.readSavedTheme() !== 'light');
     this.applyTheme();
   }
 
@@ -20,10 +19,22 @@ export class ThemeService {
 
     this.applyTheme();
 
-    localStorage.setItem(
-      'luma-theme',
-      this.isDarkMode() ? 'dark' : 'light'
-    );
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        this.isDarkMode() ? 'dark' : 'light'
+      );
+    } catch {
+      // Armazenamento indisponível (ex.: modo privado): ignora.
+    }
+  }
+
+  private readSavedTheme(): string | null {
+    try {
+      return localStorage.getItem(STORAGE_KEY);
+    } catch {
+      return null;
+    }
   }
 
   private applyTheme(): void {

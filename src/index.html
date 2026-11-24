@@ -1,10 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="utf-8">
-  <title>Angular</title>
+  <title>Luma</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- viewport-fit=cover é o que faz env(safe-area-inset-*) funcionar no iPhone -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark light">
+
+  <!-- Aplica o tema salvo ANTES do Angular carregar, evitando o flash de escuro.
+       Usa a mesma chave do ThemeService: 'luma-theme'. -->
+  <script>
+    try {
+      var saved = localStorage.getItem('luma-theme');
+      document.documentElement.setAttribute(
+        'data-theme',
+        saved === 'light' ? 'light' : 'dark'
+      );
+    } catch (e) {}
+  </script>
+
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>

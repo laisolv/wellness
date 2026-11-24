@@ -1,5 +1,4 @@
-
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { ThemeService } from '../../../core/services/theme';
@@ -8,10 +7,7 @@ import {
   LucideHouse,
   LucideImages,
   LucideBookOpen,
-  LucideUser,
-  LucideHeartPulse,
-  LucideSun,
-  LucideMoon
+  LucideHeartPulse
 } from '@lucide/angular';
 
 @Component({
@@ -28,14 +24,20 @@ import {
 })
 export class Navigation implements OnInit, OnDestroy {
 
+  // IMPORTANTE: mesmo sem usar this.themeService em lugar nenhum,
+  // injetar o serviço é o que o instancia no início do app e restaura
+  // o tema salvo. Sem isto, a página sempre abre no modo escuro.
   private readonly themeService = inject(ThemeService);
 
-  protected get isDarkMode(): boolean {
-    return this.themeService.isDarkMode();
-  }
+  // Signals: garantem que a tela atualize mesmo quando a mudança vem de
+  // fora de um evento do template (ex.: NavigationEnd do router, rAF).
+  // Em apps sem zone.js (zoneless), propriedades comuns NÃO atualizam a tela.
+  readonly activeIndex = signal(0);
+  readonly isDragging = signal(false);
 
-  activeIndex = 0;
-  isDragging = false;
+  // Só liga a animação do indicador depois da primeira posição correta,
+  // para ele não "deslizar" do Início até a aba atual ao recarregar.
+  readonly isReady = signal(false);
 
   private startX = 0;
   private moved = false;
@@ -44,6 +46,11 @@ export class Navigation implements OnInit, OnDestroy {
   private activePointerId: number | null = null;
   private suppressNextClick = false;
 
+  // Medidas do container guardadas no início do gesto,
+  // evitando querySelector + getBoundingClientRect a cada movimento.
+  private linksLeft = 0;
+  private linksWidth = 0;
+
   private clickResetTimer?: ReturnType<typeof setTimeout>;
   private navigationSubscription?: Subscription;
 
@@ -51,24 +58,44 @@ export class Navigation implements OnInit, OnDestroy {
     '/',
     '/memories',
     '/library',
-    '/wellness'  
+    '/wellness'
   ];
 
   constructor(private router: Router) {}
 
- ngOnInit(): void {
-  this.updateActiveIndex(this.router.url);
+  ngOnInit(): void {
+    this.updateActiveIndex(this.router.url);
 
-  this.navigationSubscription = this.router.events
-    .pipe(
-      filter(event => event instanceof NavigationEnd)
-    )
-    .subscribe(event => {
-      this.updateActiveIndex(
-        (event as NavigationEnd).urlAfterRedirects
-      );
-    });
-}
+    // Se a navegação inicial já terminou, a posição já está certa.
+    if (this.router.navigated) {
+      this.enableTransitions();
+    }
+
+    this.navigationSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(event => {
+        // Não puxa o indicador de volta enquanto o dedo está arrastando.
+        if (this.isDragging()) return;
+
+        this.updateActiveIndex(
+          (event as NavigationEnd).urlAfterRedirects
+        );
+
+        // Primeira rota resolvida (ex.: F5 na galeria): agora sim anima.
+        if (!this.isReady()) {
+          this.enableTransitions();
+        }
+      });
+  }
+
+  private enableTransitions(): void {
+    // Dois frames: garante que a posição inicial foi pintada sem animação.
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        this.isReady.set(true);
+      })
+    );
+  }
 
   ngOnDestroy(): void {
     this.navigationSubscription?.unsubscribe();
@@ -79,12 +106,24 @@ export class Navigation implements OnInit, OnDestroy {
   }
 
   private updateActiveIndex(url: string): void {
-    const currentRoute = url.split('?')[0].split('#')[0];
+    const currentRoute =
+      url.split('?')[0].split('#')[0].replace(/\/+$/, '') || '/';
 
-    const index = this.routes.indexOf(currentRoute);
+    const index = this.routes.findIndex(route =>
+      route === '/'
+        ? currentRoute === '/'
+        : currentRoute === route ||
+          currentRoute.startsWith(route + '/') ||
+          currentRoute.endsWith(route) // rotas dentro de um prefixo (ex.: /app/memories)
+    );
+
+    // DEBUG TEMPORÁRIO: remova depois de resolver.
+    console.log('[nav] url:', url, '| rota:', currentRoute, '| índice:', index);
 
     if (index !== -1) {
-      this.activeIndex = index;
+      this.activeIndex.set(index);
+    } else {
+      console.warn('[nav] nenhuma rota do menu bate com', currentRoute);
     }
   }
 
@@ -109,8 +148,18 @@ export class Navigation implements OnInit, OnDestroy {
       return;
     }
 
+    // CORRIGIDO: move o indicador NA HORA.
+    // Antes ele só se movia no NavigationEnd, ou seja, depois da rota
+    // carregar e da transição de página, o que causava o atraso.
+    this.activeIndex.set(index);
+
+    this.goTo(index);
+  }
+
+  private goTo(index: number): void {
     this.router.navigateByUrl(this.routes[index])
       .then(success => {
+        // Se a navegação foi cancelada, volta o indicador para a rota real.
         if (!success) {
           this.updateActiveIndex(this.router.url);
         }
@@ -125,18 +174,30 @@ export class Navigation implements OnInit, OnDestroy {
   ================================= */
 
   onPointerDown(event: PointerEvent): void {
-    const target = event.target as HTMLElement;
+    // Um novo toque inicia uma interação independente.
+    this.suppressNextClick = false;
 
-    // Mouse continua usando o clique normal.
+    if (this.clickResetTimer) {
+      clearTimeout(this.clickResetTimer);
+      this.clickResetTimer = undefined;
+    }
+
+    // Mouse continua usando o clique normal (sem arraste).
     if (event.pointerType === 'mouse') return;
+
+    const element = event.currentTarget as HTMLElement;
+    const rect = element.getBoundingClientRect();
+
+    this.linksLeft = rect.left;
+    this.linksWidth = rect.width;
 
     this.activePointerId = event.pointerId;
 
     this.startX = event.clientX;
-    this.startIndex = this.activeIndex;
+    this.startIndex = this.activeIndex();
 
     this.moved = false;
-    this.isDragging = false;
+    this.isDragging.set(false);
   }
 
   /* =================================
@@ -153,10 +214,9 @@ export class Navigation implements OnInit, OnDestroy {
 
     if (!this.moved) {
       this.moved = true;
-      this.isDragging = true;
+      this.isDragging.set(true);
 
       const element = event.currentTarget as HTMLElement;
-
       element.setPointerCapture(event.pointerId);
     }
 
@@ -175,7 +235,7 @@ export class Navigation implements OnInit, OnDestroy {
     if (this.moved) {
       this.updateIndexFromPosition(event.clientX);
 
-      const selectedIndex = this.activeIndex;
+      const selectedIndex = this.activeIndex();
 
       this.suppressNextClick = true;
 
@@ -192,28 +252,21 @@ export class Navigation implements OnInit, OnDestroy {
         this.suppressNextClick = false;
       }, 500);
 
-      this.router.navigateByUrl(this.routes[selectedIndex])
-        .then(success => {
-          if (!success) {
-            this.updateActiveIndex(this.router.url);
-          }
-        })
-        .catch(() => {
-          this.updateActiveIndex(this.router.url);
-        });
+      this.goTo(selectedIndex);
 
     } else {
-      // Um simples toque não movimenta o indicador.
-      this.activeIndex = this.startIndex;
+      // Um simples toque não movimenta o indicador aqui;
+      // o clique que vem em seguida cuida disso.
+      this.activeIndex.set(this.startIndex);
     }
 
-    this.isDragging = false;
+    this.isDragging.set(false);
     this.moved = false;
     this.activePointerId = null;
   }
 
   onPointerCancel(): void {
-    this.isDragging = false;
+    this.isDragging.set(false);
     this.moved = false;
     this.activePointerId = null;
 
@@ -225,38 +278,14 @@ export class Navigation implements OnInit, OnDestroy {
   ================================= */
 
   private updateIndexFromPosition(clientX: number): void {
-    const element = document.querySelector(
-      '.navigation-links'
-    ) as HTMLElement | null;
+    if (this.linksWidth <= 0) return;
 
-    if (!element) return;
-
-    const rect = element.getBoundingClientRect();
-
-    // Seis espaços iguais:
-    // Início, Memórias, Biblioteca, Bem-estar, Perfil e Tema.
-    const totalSlots = 4;
-    const slotWidth = rect.width / totalSlots;
-
-    const position = clientX - rect.left;
+    const slotWidth = this.linksWidth / this.routes.length;
+    const position = clientX - this.linksLeft;
     const index = Math.floor(position / slotWidth);
 
-    // O botão de tema não é uma rota.
-    this.activeIndex = Math.max(
-      0,
-      Math.min(this.routes.length - 1, index)
-    );
-  }
-
-  /* =================================
-     TEMA
-  ================================= */
-
-
-  private applyTheme(): void {
-    document.documentElement.setAttribute(
-      'data-theme',
-      this.isDarkMode ? 'dark' : 'light'
+    this.activeIndex.set(
+      Math.max(0, Math.min(this.routes.length - 1, index))
     );
   }
 }

@@ -1,4 +1,3 @@
-
 /* =================================
    RESET E BASE
 ================================= */
@@ -111,12 +110,43 @@ textarea {
   --radius-small: 8px;
   --radius-medium: 12px;
 
-  /* Navegação inferior */
+  /* Navegação inferior — compacta e leve */
   --nav-items: 4;
-  --nav-height: 64px;
-  --nav-item-height: 50px;
-  --nav-offset: 16px;
-  --nav-blur: 22px;
+  --nav-width: 288px;
+  --nav-height: 56px;
+  --nav-item-height: 44px;
+  --nav-offset: 14px;
+  --nav-gap: 4px;
+  --nav-blur: 14px;
+
+  /* Movimento: mola com leve overshoot (estilo iOS).
+     Navegadores sem linear() usam a curva de reserva. */
+  --nav-glass-duration: 520ms;
+  --ease-spring: cubic-bezier(0.34, 1.32, 0.64, 1);
+
+  /* Vidro — modo escuro */
+  --glass-bg: color-mix(in srgb, var(--color-surface) 38%, transparent);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-highlight: rgba(255, 255, 255, 0.14);
+  --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.16);
+
+  --glass-indicator-bg: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.20),
+    rgba(255, 255, 255, 0.08) 55%,
+    rgba(255, 255, 255, 0.04)
+  );
+  --glass-indicator-border: rgba(255, 255, 255, 0.22);
+  --glass-indicator-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.30),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.06),
+    0 3px 12px rgba(0, 0, 0, 0.14);
+}
+
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring: linear(0, 0.0737 4.5%, 0.2386 9.1%, 0.4316 13.6%, 0.6143 18.2%, 0.7668 22.7%, 0.8822 27.3%, 0.9616 31.8%, 1.0106 36.4%, 1.0362 40.9%, 1.0454 45.5%, 1.0445 50.0%, 1.0379 54.5%, 1.0293 59.1%, 1.0206 63.6%, 1.0130 68.2%, 1.0071 72.7%, 1.0029 77.3%, 1.0002 81.8%, 0.9986 86.4%, 0.9980 90.9%, 0.9979 95.5%, 1.0000 100.0%);
+  }
 }
 
 /* =================================
@@ -144,41 +174,55 @@ textarea {
   --color-filme: #C46A3F;
 
   --color-danger: #D05A5A;
+  --color-danger-solid: #C96B6B;
+
+  /* Vidro — modo claro */
+  --glass-bg: color-mix(in srgb, #FFFFFF 55%, transparent);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-highlight: rgba(255, 255, 255, 0.95);
+  --glass-shadow: 0 10px 30px rgba(40, 50, 30, 0.14), 0 2px 6px rgba(40, 50, 30, 0.08);
+
+  --glass-indicator-bg: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.60)
+  );
+  --glass-indicator-border: rgba(0, 0, 0, 0.05);
+  --glass-indicator-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 1),
+    0 2px 10px rgba(40, 50, 30, 0.14);
 }
 
 /* =================================
-   TRANSIÇÕES ENTRE PÁGINAS
+   TRANSIÇÃO ENTRE PÁGINAS
+   A página nova entra com fade + leve subida e desaceleração suave.
+   O componente da rota é irmão do <router-outlet>, por isso o seletor.
+   A navegação (fixa) não é afetada.
 ================================= */
 
-::view-transition-old(app-content) {
-  animation: page-out 200ms ease both;
+:root {
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-::view-transition-new(app-content) {
-  animation: page-in 300ms ease both;
+router-outlet + * {
+  animation: page-enter 380ms var(--ease-out-soft) backwards;
 }
 
-@keyframes page-out {
-  to {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes page-in {
+@keyframes page-enter {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(10px) scale(0.992);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
 
+
 /* ========================================
-   NAVEGAÇÃO INFERIOR — LUMA
+   NAVEGAÇÃO INFERIOR — LUMA (liquid glass)
 ======================================== */
 
 .navigation {
@@ -194,27 +238,24 @@ textarea {
   align-items: center;
   justify-content: center;
 
-  width: min(420px, calc(100vw - 32px));
+  width: min(var(--nav-width), calc(100vw - 32px));
   min-height: var(--nav-height);
-  padding: 7px;
+  padding: 6px;
 
   box-sizing: border-box;
 
-  background: color-mix(
-    in srgb,
-    var(--color-surface) 48%,
-    transparent
-  );
+  background: var(--glass-bg);
 
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--glass-border);
   border-radius: 999px;
 
   box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    var(--glass-shadow),
+    inset 0 1px 0 var(--glass-highlight);
 
-  backdrop-filter: blur(var(--nav-blur)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(160%);
+  /* Único backdrop-filter da navegação */
+  backdrop-filter: blur(var(--nav-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(180%);
 
   -webkit-tap-highlight-color: transparent;
 
@@ -275,9 +316,7 @@ textarea {
     user-select: none;
     -webkit-user-select: none;
 
-    transition:
-      color 400ms ease,
-      transform 300ms ease;
+    transition: color 220ms ease;
 
     span {
       display: none;
@@ -293,102 +332,85 @@ textarea {
       stroke-width: 1.8;
       pointer-events: none;
 
-      transition:
-        color 350ms ease,
-        transform 350ms cubic-bezier(0.22, 1, 0.36, 1),
-        opacity 350ms ease;
+      /* O ícone "afunda" ao toque e volta com mola */
+      scale: 1;
+      transition: scale 420ms var(--ease-spring);
     }
 
-    &:active {
-      transform: scale(0.96);
-      opacity: 0.82;
+    &:active svg {
+      scale: 0.86;
+      transition-duration: 120ms;
     }
   }
 
-  /* Hover somente em dispositivos com mouse */
+  /* Hover não altera a seleção nem a cor */
 
   @media (hover: hover) and (pointer: fine) {
-    a:hover,
+    a:not(.active):hover,
     .theme-toggle:hover {
-      color: var(--color-text);
+      color: var(--color-text-secondary);
+      background: transparent;
     }
   }
+
+  /* Somente a rota ativa recebe destaque */
 
   a.active {
     color: var(--color-primary-text);
-
-    svg {
-      filter: drop-shadow(
-        0 0 5px color-mix(
-          in srgb,
-          var(--color-primary) 30%,
-          transparent
-        )
-      );
-    }
   }
 
   .theme-toggle {
     font: inherit;
   }
 
-  /* Indicador de vidro */
+  /* Indicador de vidro
+     Sem backdrop-filter próprio (a barra já faz o vidro).
+     Anima com `translate` + mola; ao tocar/arrastar, "incha" levemente,
+     como o seletor do iOS. */
 
   .glass-indicator {
     position: absolute;
     z-index: 0;
 
     top: 0;
-    left: 0;
+    left: calc(var(--nav-gap) / 2);
 
-    width: calc(100% / var(--nav-items));
+    width: calc(100% / var(--nav-items) - var(--nav-gap));
     height: var(--nav-item-height);
 
     pointer-events: none;
 
-    border: 1px solid rgba(255, 255, 255, 0.24);
+    border: 1px solid var(--glass-indicator-border);
     border-radius: 999px;
 
-    background: linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.22),
-      rgba(255, 255, 255, 0.08) 45%,
-      rgba(255, 255, 255, 0.035)
-    );
+    background: var(--glass-indicator-bg);
+    box-shadow: var(--glass-indicator-shadow);
 
-    backdrop-filter: blur(var(--nav-blur)) saturate(180%);
-    -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(180%);
-
-    box-shadow:
-      inset 0 1px 2px rgba(255, 255, 255, 0.30),
-      inset 0 -1px 2px rgba(255, 255, 255, 0.07),
-      0 4px 16px rgba(0, 0, 0, 0.10);
-
-    transform:
-      translateX(calc(var(--glass-index, 0) * 100%))
-      scaleX(var(--glass-stretch, 1));
-
-    transform-origin: var(--glass-origin, center center);
+    translate: calc(var(--glass-index, 0) * (100% + var(--nav-gap))) 0;
+    scale: 1;
 
     transition:
-      transform 750ms cubic-bezier(0.22, 1, 0.36, 1);
+      translate var(--nav-glass-duration) var(--ease-spring),
+      scale 380ms var(--ease-spring);
 
-    will-change: transform;
+    will-change: translate, scale;
+    backface-visibility: hidden;
 
     &::before {
       content: '';
       position: absolute;
 
       top: 1px;
-      left: 15%;
-      right: 15%;
+      left: 18%;
+      right: 18%;
 
       height: 1px;
 
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.45);
+      background: var(--glass-highlight);
 
-      filter: blur(1px);
+      filter: blur(0.6px);
+      opacity: 0.8;
     }
 
     &::after {
@@ -401,12 +423,34 @@ textarea {
 
       background: radial-gradient(
         ellipse at 30% 0%,
-        rgba(255, 255, 255, 0.16),
+        rgba(255, 255, 255, 0.14),
         transparent 65%
       );
 
       pointer-events: none;
     }
+  }
+
+  /* Pressionado ou arrastando: o vidro cresce um pouco */
+
+  .navigation-links:has(a:active) .glass-indicator,
+  .navigation-links.is-dragging .glass-indicator {
+    scale: 1.1 1.16;
+  }
+
+  /* Durante o arrasto o indicador continua com mola, só mais ágil */
+
+  .navigation-links.is-dragging .glass-indicator {
+    transition:
+      translate 320ms var(--ease-spring),
+      scale 380ms var(--ease-spring);
+  }
+
+  /* Antes da primeira posição correta (ex.: recarregar a página),
+     o indicador aparece direto no lugar, sem deslizar. */
+
+  .navigation-links:not(.is-ready) .glass-indicator {
+    transition: none;
   }
 }
 
@@ -433,7 +477,7 @@ body:has(.library-form-overlay, .delete-overlay) .navigation {
 
 @media (max-width: 768px) {
   :root {
-    --nav-blur: 16px;
+    --nav-blur: 12px;
   }
 }
 
@@ -443,8 +487,9 @@ body:has(.library-form-overlay, .delete-overlay) .navigation {
 
 @media (max-width: 560px) {
   :root {
-    --nav-height: 72px;
-    --nav-item-height: 56px;
+    --nav-width: 296px;
+    --nav-height: 58px;
+    --nav-item-height: 46px;
     --nav-offset: 10px;
   }
 
@@ -452,32 +497,6 @@ body:has(.library-form-overlay, .delete-overlay) .navigation {
   select,
   textarea {
     font-size: 16px;
-  }
-
-  .navigation {
-    z-index: 9999;
-
-    left: max(10px, env(safe-area-inset-left));
-    right: max(10px, env(safe-area-inset-right));
-
-    width: auto;
-    transform: none;
-
-    padding: 8px 5px;
-
-    .navigation-links {
-      width: 100%;
-    }
-
-    a,
-    .theme-toggle {
-      min-height: var(--nav-item-height);
-
-      svg {
-        width: 23px;
-        height: 23px;
-      }
-    }
   }
 }
 
@@ -487,15 +506,11 @@ body:has(.library-form-overlay, .delete-overlay) .navigation {
 
 @media (max-width: 360px) {
   :root {
-    --nav-item-height: 52px;
+    --nav-width: 264px;
+    --nav-item-height: 44px;
   }
 
   .navigation {
-    left: max(7px, env(safe-area-inset-left));
-    right: max(7px, env(safe-area-inset-right));
-
-    padding: 7px 3px;
-
     a,
     .theme-toggle {
       svg {
@@ -512,13 +527,9 @@ body:has(.library-form-overlay, .delete-overlay) .navigation {
 
 @media (max-height: 480px) and (orientation: landscape) {
   :root {
-    --nav-height: 54px;
-    --nav-item-height: 42px;
+    --nav-height: 50px;
+    --nav-item-height: 40px;
     --nav-offset: 6px;
-  }
-
-  .navigation {
-    padding: 5px;
   }
 }
 
@@ -527,16 +538,15 @@ body:has(.library-form-overlay, .delete-overlay) .navigation {
 ======================================== */
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  .navigation,
+  .navigation *,
+  .navigation *::before,
+  .navigation *::after {
     transition: none !important;
     animation: none !important;
-    scroll-behavior: auto !important;
   }
 
-  ::view-transition-old(app-content),
-  ::view-transition-new(app-content) {
+  router-outlet + * {
     animation: none !important;
   }
 }

@@ -1,7 +1,14 @@
 :host {
   display: block;
+  width: 100%;
 
-  // Desfoque na parte inferior da tela (atrás da navegação)
+  // Desfoque na parte inferior da tela, atrás da navegação.
+  //
+  // CORRIGIDO: era blur(12px). Esta faixa fica empilhada com o
+  // backdrop-filter da própria .navigation, então um blur menor
+  // e a camada própria na GPU deixam a animação bem mais leve.
+  // Se ainda pesar (principalmente no iOS/Safari), apague este bloco
+  // inteiro: a navegação já tem efeito de vidro sozinha.
   &::before {
     content: '';
     position: fixed;
@@ -9,7 +16,6 @@
     right: 0;
     bottom: 0;
 
-    // Cobre a navegação + um respiro acima dela (variáveis vêm do style.scss global)
     height: calc(
       var(--nav-height) +
       var(--nav-offset) +
@@ -21,8 +27,10 @@
     z-index: 999;
     pointer-events: none;
 
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+
+    transform: translateZ(0);
 
     mask-image: linear-gradient(
       to bottom,
@@ -40,5 +48,7 @@
   }
 }
 
-// A navegação inferior (.navigation, .glass-indicator, hover, tema claro/escuro,
-// celulares, área segura) agora fica somente no style.scss global.
+// Os estilos de .navigation, .navigation-links,
+// .glass-indicator, ícones, estados ativos,
+// tema claro/escuro e responsividade permanecem
+// no style.scss global (arquivo styles.css que enviei antes).
