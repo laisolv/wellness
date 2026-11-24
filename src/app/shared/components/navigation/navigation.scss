@@ -1,8 +1,7 @@
-
 :host {
   display: block;
-  position: relative;
 
+  // Desfoque na parte inferior da tela (atrás da navegação)
   &::before {
     content: '';
     position: fixed;
@@ -10,6 +9,7 @@
     right: 0;
     bottom: 0;
 
+    // Cobre a navegação + um respiro acima dela (variáveis vêm do style.scss global)
     height: calc(
       var(--nav-height) +
       var(--nav-offset) +
@@ -18,7 +18,7 @@
       env(safe-area-inset-bottom)
     );
 
-    z-index: 998;
+    z-index: 999;
     pointer-events: none;
 
     backdrop-filter: blur(12px);
@@ -39,3 +39,6 @@
     );
   }
 }
+
+// A navegação inferior (.navigation, .glass-indicator, hover, tema claro/escuro,
+// celulares, área segura) agora fica somente no style.scss global.

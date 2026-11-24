@@ -15,6 +15,37 @@ import { WellnessActivity } from '../../core/models/wellness-activity';
 })
 export class Wellness {
 
+  weekDays = [
+    { label: 'SEG', date: 1 },
+    { label: 'TER', date: 2 },
+    { label: 'QUA', date: 3 },
+    { label: 'QUI', date: 4 },
+    { label: 'SEX', date: 5 },
+    { label: 'SÁB', date: 6 },
+    { label: 'DOM', date: 0 },
+
+  ];
+
+  isDayActive(day: number): boolean {
+  const today = new Date();
+  const currentDay = today.getDay();
+
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - ((currentDay + 6) % 7));
+  monday.setHours(0, 0, 0, 0);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+
+  return this.activities.some(item => {
+    const activityDate = new Date(`${item.date}T12:00:00`);
+    return activityDate >= monday &&
+      activityDate <= sunday &&
+      activityDate.getDay() === day;
+  });
+}
+
   showForm = false;
 
   activity: WellnessActivity = this.createEmptyActivity();

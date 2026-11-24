@@ -63,30 +63,6 @@
       <span>Bem-estar</span>
     </a>
 
-    <a
-      href="/profile"
-      [class.active]="activeIndex === 4"
-      [attr.aria-current]="activeIndex === 4 ? 'page' : null"
-      aria-label="Perfil"
-      (click)="navigate($event, 4)"
-    >
-      <svg lucideUser></svg>
-      <span>Perfil</span>
-    </a>
-
-    <button
-      class="theme-toggle"
-      type="button"
-      (click)="toggleTheme()"
-      [attr.aria-label]="isDarkMode ? 'Ativar modo claro' : 'Ativar modo escuro'"
-      [attr.title]="isDarkMode ? 'Modo claro' : 'Modo escuro'"
-    >
-      @if (isDarkMode) {
-        <svg lucideSun></svg>
-      } @else {
-        <svg lucideMoon></svg>
-      }
-    </button>
 
   </div>
 </nav>

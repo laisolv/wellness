@@ -1,7 +1,8 @@
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
+import { ThemeService } from '../../../core/services/theme';
 
 import {
   LucideHouse,
@@ -18,11 +19,8 @@ import {
   imports: [
     LucideHouse,
     LucideImages,
-    LucideUser,
     LucideBookOpen,
-    LucideHeartPulse,
-    LucideSun,
-    LucideMoon
+    LucideHeartPulse
   ],
   selector: 'app-navigation',
   styleUrl: './navigation.scss',
@@ -30,7 +28,11 @@ import {
 })
 export class Navigation implements OnInit, OnDestroy {
 
-  protected isDarkMode = true;
+  private readonly themeService = inject(ThemeService);
+
+  protected get isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
+  }
 
   activeIndex = 0;
   isDragging = false;
@@ -42,39 +44,38 @@ export class Navigation implements OnInit, OnDestroy {
   private activePointerId: number | null = null;
   private suppressNextClick = false;
 
+  private clickResetTimer?: ReturnType<typeof setTimeout>;
   private navigationSubscription?: Subscription;
 
   private readonly routes = [
     '/',
     '/memories',
     '/library',
-    '/wellness',
-    '/profile'
+    '/wellness'  
   ];
 
   constructor(private router: Router) {}
 
-  ngOnInit(): void {
-    const savedTheme = localStorage.getItem('luma-theme');
+ ngOnInit(): void {
+  this.updateActiveIndex(this.router.url);
 
-    this.isDarkMode = savedTheme !== 'light';
-    this.applyTheme();
-
-    this.updateActiveIndex(this.router.url);
-
-    this.navigationSubscription = this.router.events
-      .pipe(
-        filter(event => event instanceof NavigationEnd)
-      )
-      .subscribe(event => {
-        this.updateActiveIndex(
-          (event as NavigationEnd).urlAfterRedirects
-        );
-      });
-  }
+  this.navigationSubscription = this.router.events
+    .pipe(
+      filter(event => event instanceof NavigationEnd)
+    )
+    .subscribe(event => {
+      this.updateActiveIndex(
+        (event as NavigationEnd).urlAfterRedirects
+      );
+    });
+}
 
   ngOnDestroy(): void {
     this.navigationSubscription?.unsubscribe();
+
+    if (this.clickResetTimer) {
+      clearTimeout(this.clickResetTimer);
+    }
   }
 
   private updateActiveIndex(url: string): void {
@@ -96,15 +97,17 @@ export class Navigation implements OnInit, OnDestroy {
 
     if (this.suppressNextClick) {
       this.suppressNextClick = false;
+
+      if (this.clickResetTimer) {
+        clearTimeout(this.clickResetTimer);
+      }
+
       return;
     }
 
     if (index < 0 || index >= this.routes.length) {
       return;
     }
-
-    // Não altera o indicador antecipadamente.
-    // A posição será atualizada no NavigationEnd.
 
     this.router.navigateByUrl(this.routes[index])
       .then(success => {
@@ -124,11 +127,8 @@ export class Navigation implements OnInit, OnDestroy {
   onPointerDown(event: PointerEvent): void {
     const target = event.target as HTMLElement;
 
-    // Mouse não movimenta o indicador.
+    // Mouse continua usando o clique normal.
     if (event.pointerType === 'mouse') return;
-
-    // O botão de tema não participa do arraste.
-    if (target.closest('.theme-toggle')) return;
 
     this.activePointerId = event.pointerId;
 
@@ -148,8 +148,8 @@ export class Navigation implements OnInit, OnDestroy {
 
     const distance = Math.abs(event.clientX - this.startX);
 
-    // Só considera arraste depois de um movimento real.
-    if (!this.moved && distance < 8) return;
+    // Evita interpretar pequenos toques como arraste.
+    if (!this.moved && distance < 5) return;
 
     if (!this.moved) {
       this.moved = true;
@@ -183,6 +183,15 @@ export class Navigation implements OnInit, OnDestroy {
         element.releasePointerCapture(event.pointerId);
       }
 
+      if (this.clickResetTimer) {
+        clearTimeout(this.clickResetTimer);
+      }
+
+      // Protege contra o clique sintético após o arraste.
+      this.clickResetTimer = setTimeout(() => {
+        this.suppressNextClick = false;
+      }, 500);
+
       this.router.navigateByUrl(this.routes[selectedIndex])
         .then(success => {
           if (!success) {
@@ -192,12 +201,6 @@ export class Navigation implements OnInit, OnDestroy {
         .catch(() => {
           this.updateActiveIndex(this.router.url);
         });
-
-      // Evita que o clique sintético do gesto seja interpretado
-      // como um segundo clique.
-      setTimeout(() => {
-        this.suppressNextClick = false;
-      }, 0);
 
     } else {
       // Um simples toque não movimenta o indicador.
@@ -214,7 +217,6 @@ export class Navigation implements OnInit, OnDestroy {
     this.moved = false;
     this.activePointerId = null;
 
-    // Retorna para a rota realmente aberta.
     this.updateActiveIndex(this.router.url);
   }
 
@@ -223,27 +225,26 @@ export class Navigation implements OnInit, OnDestroy {
   ================================= */
 
   private updateIndexFromPosition(clientX: number): void {
-    const element = document.querySelector('.navigation-links');
+    const element = document.querySelector(
+      '.navigation-links'
+    ) as HTMLElement | null;
 
     if (!element) return;
 
-    const links = element.querySelectorAll(':scope > a');
+    const rect = element.getBoundingClientRect();
 
-    if (!links.length) return;
+    // Seis espaços iguais:
+    // Início, Memórias, Biblioteca, Bem-estar, Perfil e Tema.
+    const totalSlots = 4;
+    const slotWidth = rect.width / totalSlots;
 
-    const first = links[0].getBoundingClientRect();
-    const last = links[links.length - 1].getBoundingClientRect();
+    const position = clientX - rect.left;
+    const index = Math.floor(position / slotWidth);
 
-    const totalWidth = last.right - first.left;
-    const itemWidth = totalWidth / links.length;
-
-    const position = clientX - first.left;
-
-    const index = Math.floor(position / itemWidth);
-
+    // O botão de tema não é uma rota.
     this.activeIndex = Math.max(
       0,
-      Math.min(links.length - 1, index)
+      Math.min(this.routes.length - 1, index)
     );
   }
 
@@ -251,16 +252,6 @@ export class Navigation implements OnInit, OnDestroy {
      TEMA
   ================================= */
 
-  protected toggleTheme(): void {
-    this.isDarkMode = !this.isDarkMode;
-
-    this.applyTheme();
-
-    localStorage.setItem(
-      'luma-theme',
-      this.isDarkMode ? 'dark' : 'light'
-    );
-  }
 
   private applyTheme(): void {
     document.documentElement.setAttribute(

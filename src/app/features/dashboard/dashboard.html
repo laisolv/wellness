@@ -1,12 +1,43 @@
 
 <section class="feed">
 
-  <!-- Cabeçalho do feed -->
-  <header class="feed-header">
-    <div>
-      <span class="feed-eyebrow">LUMA · SEU ESPAÇO</span>
-    </div>
-  </header>
+  
+<header class="feed-header">
+
+  <div class="feed-header-info">
+    <span class="feed-eyebrow">LUMA · SEU ESPAÇO</span>
+  </div>
+
+  <div class="feed-header-actions">
+
+    <button
+      type="button"
+      class="header-icon"
+      aria-label="Abrir perfil"
+      title="Perfil"
+      (click)="openProfile()"
+    >
+      <svg lucideUser></svg>
+    </button>
+
+    <button
+      type="button"
+      class="header-icon"
+      (click)="toggleTheme()"
+      [attr.aria-label]="isDarkMode() ? 'Ativar modo claro' : 'Ativar modo escuro'"
+      [attr.title]="isDarkMode() ? 'Modo claro' : 'Modo escuro'"
+    >
+      @if (isDarkMode()) {
+        <svg lucideSun></svg>
+      } @else {
+        <svg lucideMoon></svg>
+      }
+    </button>
+
+  </div>
+
+</header>
+
 
   <!-- Componente de criação de publicações -->
   <app-composer

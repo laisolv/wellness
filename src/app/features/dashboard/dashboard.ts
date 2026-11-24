@@ -1,17 +1,37 @@
+
 import { Component, signal, inject, OnInit, HostListener } from '@angular/core';
+import { Router } from '@angular/router';
+
 import { Publication } from '../../core/models/publication';
 import { PublicationService } from '../../core/services/publication';
+import { ThemeService } from '../../core/services/theme';
+
 import { Composer } from './composer/composer';
+
+import {
+  LucideUser,
+  LucideSun,
+  LucideMoon
+} from '@lucide/angular';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [Composer],
+  imports: [
+    Composer,
+    LucideUser,
+    LucideSun,
+    LucideMoon
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
 export class Dashboard implements OnInit {
 
   private readonly publicationService = inject(PublicationService);
+  private readonly themeService = inject(ThemeService);
+  private readonly router = inject(Router);
+
+  protected readonly isDarkMode = this.themeService.isDarkMode;
 
   protected readonly composerOpen = signal(false);
   protected readonly draft = signal('');
@@ -30,6 +50,16 @@ export class Dashboard implements OnInit {
     this.publicationService.getAll().then(publications => {
       this.publications.set(publications);
     });
+  }
+
+  // Cabeçalho
+
+  protected openProfile(): void {
+    this.router.navigateByUrl('/profile');
+  }
+
+  protected toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 
   // Timeline
