@@ -2,6 +2,7 @@
 import Dexie, { Table } from 'dexie';
 import { Injectable } from '@angular/core';
 import { LibraryItem } from '../models/library-item';
+import { WellnessActivity } from '../models/wellness-activity';
 
 interface Publication {
   id: number;
@@ -13,19 +14,26 @@ interface Publication {
 class LumaDatabase extends Dexie {
   publications!: Table<Publication, number>;
   libraryItems!: Table<LibraryItem, number>;
+  wellnessActivities!: Table<WellnessActivity, number>;
 
-  constructor() {
-    super('LumaDatabase');
+ constructor() {
+  super('LumaDatabase');
 
-    this.version(1).stores({
-      publications: 'id, category, date'
-    });
+  this.version(1).stores({
+    publications: 'id, category, date'
+  });
 
-    this.version(2).stores({
-      publications: 'id, category, date',
-      libraryItems: '++id, type, title'
-    })
-  }
+  this.version(2).stores({
+    publications: 'id, category, date',
+    libraryItems: '++id, type, title'
+  });
+
+  this.version(3).stores({
+    publications: 'id, category, date',
+    libraryItems: '++id, type, title',
+    wellnessActivities: '++id, date, activityType'
+  });
+}
 }
 
 @Injectable({
@@ -64,5 +72,24 @@ export class PublicationService {
 
   updateLibraryItem(item: LibraryItem) {
     return this.db.libraryItems.put(item);
+  }
+
+  getWellnessActivities() {
+    return this.db.wellnessActivities
+    .orderBy('date')
+    .reverse()
+    .toArray();
+  }
+
+  addWellnessActivity(activity: WellnessActivity) {
+    return this.db.wellnessActivities.add(activity);
+  }
+
+  deleteWellnessActivity(id: number) {
+    return this.db.wellnessActivities.delete(id);
+  }
+
+  updateWellnessActivity(activity: WellnessActivity) {
+    return this.db.wellnessActivities.put(activity);
   }
 }

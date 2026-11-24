@@ -1,1 +1,315 @@
-<p>wellness works!</p>
+
+<section class="wellness">
+
+  <header class="wellness-header">
+    <div>
+      <span class="wellness-eyebrow">LUMA · SEU CUIDADO</span>
+      <h1>Bem-estar</h1>
+      <p>Cuide do seu corpo, respeite seu ritmo.</p>
+    </div>
+  </header>
+
+  <section class="wellness-highlight">
+    <div class="highlight-content">
+      <span class="section-label">UM PASSO DE CADA VEZ</span>
+      <h2>Como você quer se sentir hoje?</h2>
+      <p>Pequenos movimentos também fazem parte de uma grande mudança.</p>
+      <button type="button" (click)="openForm()">
+        Registrar atividade
+      </button>
+    </div>
+
+    <div class="highlight-decoration" aria-hidden="true">
+      <span>✳</span>
+    </div>
+  </section>
+
+  <section class="wellness-week">
+    <div class="section-heading">
+      <div>
+        <span class="section-label">SUA ROTINA</span>
+        <h2>Esta semana</h2>
+      </div>
+      <span class="week-caption">Seu ritmo, seu tempo</span>
+    </div>
+
+    <div class="week-days">
+      <div class="day">
+        <span>SEG</span>
+        <span class="day-indicator active"></span>
+      </div>
+      <div class="day">
+        <span>TER</span>
+        <span class="day-indicator"></span>
+      </div>
+      <div class="day">
+        <span>QUA</span>
+        <span class="day-indicator active"></span>
+      </div>
+      <div class="day">
+        <span>QUI</span>
+        <span class="day-indicator"></span>
+      </div>
+      <div class="day">
+        <span>SEX</span>
+        <span class="day-indicator"></span>
+      </div>
+      <div class="day">
+        <span>SÁB</span>
+        <span class="day-indicator"></span>
+      </div>
+      <div class="day">
+        <span>DOM</span>
+        <span class="day-indicator"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="wellness-activities">
+    <div class="section-heading">
+      <div>
+        <span class="section-label">MOVIMENTO</span>
+        <h2>Seu corpo em movimento</h2>
+      </div>
+    </div>
+
+    <div class="activity-grid">
+      <article class="activity-item">
+        <span class="activity-icon">↗</span>
+        <h3>Treinos</h3>
+        <p>Registre suas atividades e acompanhe sua evolução.</p>
+      </article>
+
+      <article class="activity-item">
+        <span class="activity-icon">♡</span>
+        <h3>Equilíbrio</h3>
+        <p>Encontre espaço para pausas, descanso e autocuidado.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="wellness-history">
+
+    <div class="section-heading">
+      <div>
+        <span class="section-label">ACOMPANHAMENTO</span>
+        <h2>Suas atividades</h2>
+      </div>
+
+      <span class="history-count">
+        {{ activities.length }}
+        {{ activities.length === 1 ? 'registro' : 'registros' }}
+      </span>
+    </div>
+
+    @if (activities.length > 0) {
+
+      <div class="history-list">
+
+        @for (item of activities; track item.id) {
+          <article class="history-item">
+
+            <div class="history-icon">↗</div>
+
+            <div class="history-info">
+              <h3>{{ item.activityType }}</h3>
+
+              <p>
+                {{ item.date | date:'dd/MM/yyyy' }}
+                · {{ item.durationMinutes }} minutos
+              </p>
+
+              @if (item.notes) {
+                <span class="history-notes">
+                  {{ item.notes }}
+                </span>
+              }
+            </div>
+
+            <div class="history-actions">
+
+              <button
+                type="button"
+                class="edit-action"
+                (click)="editActivity(item)"
+                aria-label="Editar atividade"
+              >
+                ✎
+              </button>
+
+              <button
+                type="button"
+                class="delete-action"
+                (click)="deleteActivity(item.id!)"
+                aria-label="Excluir atividade"
+              >
+                ×
+              </button>
+
+            </div>
+          </article>
+        }
+
+      </div>
+
+    } @else {
+
+      <div class="history-empty">
+        <span>✳</span>
+        <p>Suas atividades aparecerão aqui.</p>
+        <small>Cada pequeno movimento merece ser registrado.</small>
+      </div>
+
+    }
+
+  </section>
+
+  <!-- Confirmação de exclusão -->
+  @if (activityToDelete !== null) {
+
+    <div class="delete-overlay" (click)="cancelDelete()">
+
+      <div
+        class="delete-modal"
+        (click)="$event.stopPropagation()"
+      >
+
+        <div class="delete-icon">!</div>
+
+        <span class="section-label">CONFIRMAÇÃO</span>
+        <h2>Excluir atividade?</h2>
+
+        <p>
+          Essa atividade será removida do seu histórico.
+          Essa ação não poderá ser desfeita.
+        </p>
+
+        <div class="delete-actions">
+
+          <button
+            type="button"
+            class="delete-cancel"
+            (click)="cancelDelete()"
+          >
+            Manter atividade
+          </button>
+
+          <button
+            type="button"
+            class="delete-confirm"
+            [disabled]="isDeleting"
+            (click)="confirmDelete()"
+          >
+            {{ isDeleting ? 'Excluindo...' : 'Excluir' }}
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+
+  }
+
+  <!-- Formulário de atividade -->
+  @if (showForm) {
+
+    <div class="wellness-modal-overlay" (click)="closeForm()">
+
+      <div
+        class="wellness-modal"
+        (click)="$event.stopPropagation()"
+      >
+
+        <header class="modal-header">
+          <div>
+            <span class="section-label">SUA JORNADA</span>
+            <h2>
+              {{ activity.id !== undefined ? 'Editar atividade' : 'Registrar atividade' }}
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            class="modal-close"
+            (click)="closeForm()"
+            aria-label="Fechar"
+          >
+            ×
+          </button>
+        </header>
+
+        <div class="modal-body">
+
+          <label for="activityType">Tipo de atividade</label>
+
+          <select
+            id="activityType"
+            [(ngModel)]="activity.activityType"
+          >
+            <option value="">Escolha uma atividade</option>
+            <option value="Musculação">Musculação</option>
+            <option value="Corrida">Corrida</option>
+            <option value="Caminhada">Caminhada</option>
+            <option value="Bicicleta">Bicicleta</option>
+            <option value="Yoga">Yoga</option>
+            <option value="Pilates">Pilates</option>
+            <option value="Jiu-Jitsu">Jiu-Jitsu</option>
+            <option value="Funcional">Funcional</option>
+            <option value="Outro">Outro</option>
+          </select>
+
+          <label for="activityDate">Data</label>
+
+          <input
+            id="activityDate"
+            type="date"
+            [(ngModel)]="activity.date"
+          />
+
+          <label for="activityDuration">Duração (minutos)</label>
+
+          <input
+            id="activityDuration"
+            type="number"
+            min="1"
+            [(ngModel)]="activity.durationMinutes"
+          />
+
+          <label for="activityNotes">Observações (opcional)</label>
+
+          <textarea
+            id="activityNotes"
+            rows="3"
+            placeholder="Como foi sua atividade?"
+            [(ngModel)]="activity.notes"
+          ></textarea>
+
+        </div>
+
+        <footer class="modal-footer">
+
+          <button
+            type="button"
+            class="cancel-button"
+            (click)="closeForm()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="save-button"
+            [disabled]="isSaving"
+            (click)="savedActivity()"
+          >
+            {{ isSaving ? 'Salvando...' : 'Salvar atividade' }}
+          </button>
+
+        </footer>
+
+      </div>
+    </div>
+
+  }
+
+</section>

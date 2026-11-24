@@ -1,63 +1,79 @@
 
 <nav class="navigation">
 
-  <!-- Identidade do Luma -->
   <div class="navigation-brand">
-    <a routerLink="/" class="brand-link">
+    <a href="/" class="brand-link" (click)="navigate($event, 0)">
       <h1>LUMA<span>.</span></h1>
     </a>
   </div>
 
-  <!-- Navegação -->
-  <div class="navigation-links">
+  <div
+    class="navigation-links"
+    [class.is-dragging]="isDragging"
+    [style.--glass-index]="activeIndex"
+    (pointerdown)="onPointerDown($event)"
+    (pointermove)="onPointerMove($event)"
+    (pointerup)="onPointerUp($event)"
+    (pointercancel)="onPointerCancel()"
+  >
+
+    <div class="glass-indicator"></div>
 
     <a
-      routerLink="/"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
+      href="/"
+      [class.active]="activeIndex === 0"
+      [attr.aria-current]="activeIndex === 0 ? 'page' : null"
       aria-label="Início"
+      (click)="navigate($event, 0)"
     >
       <svg lucideHouse></svg>
       <span>Início</span>
     </a>
 
     <a
-      routerLink="/memories"
-      routerLinkActive="active"
+      href="/memories"
+      [class.active]="activeIndex === 1"
+      [attr.aria-current]="activeIndex === 1 ? 'page' : null"
       aria-label="Memórias"
+      (click)="navigate($event, 1)"
     >
       <svg lucideImages></svg>
       <span>Memórias</span>
     </a>
 
     <a
-      routerLink="/library"
-      routerLinkActive="active"
+      href="/library"
+      [class.active]="activeIndex === 2"
+      [attr.aria-current]="activeIndex === 2 ? 'page' : null"
       aria-label="Biblioteca"
+      (click)="navigate($event, 2)"
     >
       <svg lucideBookOpen></svg>
       <span>Biblioteca</span>
     </a>
 
     <a
-      routerLink="/wellness"
-      routerLinkActive="active"
+      href="/wellness"
+      [class.active]="activeIndex === 3"
+      [attr.aria-current]="activeIndex === 3 ? 'page' : null"
       aria-label="Bem-estar"
+      (click)="navigate($event, 3)"
     >
       <svg lucideHeartPulse></svg>
       <span>Bem-estar</span>
     </a>
 
     <a
-      routerLink="/profile"
-      routerLinkActive="active"
+      href="/profile"
+      [class.active]="activeIndex === 4"
+      [attr.aria-current]="activeIndex === 4 ? 'page' : null"
       aria-label="Perfil"
+      (click)="navigate($event, 4)"
     >
       <svg lucideUser></svg>
       <span>Perfil</span>
     </a>
 
-    <!-- Alternar tema -->
     <button
       class="theme-toggle"
       type="button"
@@ -73,5 +89,4 @@
     </button>
 
   </div>
-
 </nav>
