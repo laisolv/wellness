@@ -1,1 +1,128 @@
-<p>profile works!</p>
+
+<section class="profile-page">
+
+  <header class="profile-header">
+    <button
+      type="button"
+      class="back-button"
+      (click)="goBack()">
+      ← Voltar
+    </button>
+
+    <span class="profile-eyebrow">LUMA · SEU ESPAÇO</span>
+  </header>
+
+  <main class="profile-content">
+
+    <div class="profile-intro">
+      <span class="section-eyebrow">SUA IDENTIDADE</span>
+      <h1>Seu perfil</h1>
+      <p>
+        Um espaço para colocar um pouco de você no Luma.
+      </p>
+    </div>
+
+    <form (submit)="$event.preventDefault(); saveProfile()">
+
+      <section class="photo-section">
+
+        <div class="photo-preview">
+
+          @if (photo()) {
+            <img [src]="photo()" alt="Foto de perfil">
+          } @else {
+            <span>{{ getInitials() }}</span>
+          }
+
+        </div>
+
+        <div class="photo-controls">
+          <strong>Foto de perfil</strong>
+
+          <p>
+            Escolha uma imagem que represente você.
+          </p>
+
+          <div class="photo-actions">
+            <label class="photo-button">
+              Escolher foto
+              <input
+                type="file"
+                accept="image/*"
+                (change)="selectPhoto($event)">
+            </label>
+
+            @if (photo()) {
+              <button
+                type="button"
+                class="remove-photo"
+                (click)="removePhoto()">
+                Remover
+              </button>
+            }
+          </div>
+        </div>
+
+      </section>
+
+      <div class="form-divider"></div>
+
+      <div class="form-field">
+        <label for="profile-name">Nome</label>
+
+        <input
+          id="profile-name"
+          type="text"
+          maxlength="40"
+          placeholder="Como você gostaria de ser chamado?"
+          [value]="name()"
+          (input)="updateName($event)"
+          required>
+      </div>
+
+      <div class="form-field">
+        <label for="profile-description">Sobre você</label>
+
+        <textarea
+          id="profile-description"
+          maxlength="160"
+          rows="3"
+          placeholder="Uma pequena descrição sobre você..."
+          [value]="description()"
+          (input)="updateDescription($event)">
+        </textarea>
+
+        <span class="character-count">
+          {{ description().length }}/160
+        </span>
+      </div>
+
+      @if (errorMessage()) {
+        <p class="profile-error" role="alert">
+          {{ errorMessage() }}
+        </p>
+      }
+
+      <div class="profile-actions">
+
+        <button
+          type="button"
+          class="cancel-button"
+          (click)="goBack()">
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="save-button"
+          [disabled]="saving()">
+          {{ saving() ? 'Salvando...' : 'Salvar alterações' }}
+        </button>
+
+      </div>
+
+    </form>
+
+  </main>
+
+</section>

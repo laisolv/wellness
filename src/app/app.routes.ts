@@ -26,12 +26,6 @@ export const routes: Routes = [
             import('./features/wellness/wellness')
         .then(m => m.Wellness)
     },
-       {
-        path: 'habits',
-        loadComponent: () =>
-            import('./features/habits/habits')
-        .then(m => m.Habits)
-    },
     {
         path: 'profile',
         loadComponent: () =>

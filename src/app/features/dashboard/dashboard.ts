@@ -1,15 +1,24 @@
 
-import { Component, signal, inject, OnInit, HostListener } from '@angular/core';
+import {
+  Component,
+  signal,
+  inject,
+  OnInit,
+  HostListener
+} from '@angular/core';
+
 import { Router } from '@angular/router';
 
 import { Publication } from '../../core/models/publication';
+import { Profile as ProfileData } from '../../core/models/profile';
+
 import { PublicationService } from '../../core/services/publication';
+import { ProfileService } from '../../core/services/profile';
 import { ThemeService } from '../../core/services/theme';
 
 import { Composer } from './composer/composer';
 
 import {
-  LucideUser,
   LucideSun,
   LucideMoon
 } from '@lucide/angular';
@@ -18,7 +27,6 @@ import {
   selector: 'app-dashboard',
   imports: [
     Composer,
-    LucideUser,
     LucideSun,
     LucideMoon
   ],
@@ -28,35 +36,76 @@ import {
 export class Dashboard implements OnInit {
 
   private readonly publicationService = inject(PublicationService);
+  private readonly profileService = inject(ProfileService);
   private readonly themeService = inject(ThemeService);
   private readonly router = inject(Router);
 
   protected readonly isDarkMode = this.themeService.isDarkMode;
 
+  // Perfil
+  protected readonly profile = signal<ProfileData | null>(null);
+
+  // Composer
   protected readonly composerOpen = signal(false);
   protected readonly draft = signal('');
   protected readonly imagePreview = signal<string | null>(null);
 
+  // Publicações
+  protected readonly publications = signal<Publication[]>([]);
+
   protected readonly confirmDeleteId = signal<number | null>(null);
   protected readonly editingPublicationId = signal<number | null>(null);
   protected readonly openMenuId = signal<number | null>(null);
-  protected readonly publications = signal<Publication[]>([]);
 
   // Visualização de fotografias
   protected readonly selectedImage = signal<string | null>(null);
   protected readonly selectedImageIndex = signal<number | null>(null);
 
   ngOnInit(): void {
+    this.loadPublications();
+    this.loadProfile();
+  }
+
+  // Carregamento dos dados
+
+  private loadPublications(): void {
     this.publicationService.getAll().then(publications => {
       this.publications.set(publications);
     });
   }
 
-  // Cabeçalho
+  private loadProfile(): void {
+    this.profileService.getProfile().then(profile => {
+      this.profile.set(profile ?? null);
+    }).catch(error => {
+      console.error('Não foi possível carregar o perfil:', error);
+    });
+  }
+
+  // Perfil
 
   protected openProfile(): void {
     this.router.navigateByUrl('/profile');
   }
+
+  protected getProfileInitials(): string {
+    const name = this.profile()?.name?.trim() || '';
+
+    const parts = name.split(/\s+/).filter(Boolean);
+
+    if (parts.length === 0) return 'L';
+
+    if (parts.length === 1) {
+      return parts[0].charAt(0).toUpperCase();
+    }
+
+    return (
+      parts[0].charAt(0) +
+      parts[parts.length - 1].charAt(0)
+    ).toUpperCase();
+  }
+
+  // Tema
 
   protected toggleTheme(): void {
     this.themeService.toggleTheme();
@@ -129,7 +178,7 @@ export class Dashboard implements OnInit {
     return `editado há ${days} ${days === 1 ? 'dia' : 'dias'}`;
   }
 
-  // Cadastro e edição
+  // Cadastro e edição de publicações
 
   protected async publish(data: {
     content: string;
@@ -151,7 +200,9 @@ export class Dashboard implements OnInit {
       date: existingPublication?.date ?? new Date().toISOString(),
       content,
       image,
-      editedAt: editingId !== null ? new Date().toISOString() : null
+      editedAt: editingId !== null
+        ? new Date().toISOString()
+        : null
     };
 
     if (editingId !== null) {
@@ -230,7 +281,7 @@ export class Dashboard implements OnInit {
 
     if (id === null) return;
 
-    this.deletePublication(id);
+    void this.deletePublication(id);
   }
 
   protected async deletePublication(id: number): Promise<void> {
@@ -264,6 +315,7 @@ export class Dashboard implements OnInit {
     event.stopPropagation();
 
     const images = this.getImages();
+
     if (images.length === 0) return;
 
     const currentIndex = this.selectedImageIndex() ?? 0;
@@ -278,6 +330,7 @@ export class Dashboard implements OnInit {
     event.stopPropagation();
 
     const images = this.getImages();
+
     if (images.length === 0) return;
 
     const currentIndex = this.selectedImageIndex() ?? 0;

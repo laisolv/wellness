@@ -1,43 +1,54 @@
 
 <section class="feed">
 
-  
-<header class="feed-header">
-
-  <div class="feed-header-info">
-    <span class="feed-eyebrow">LUMA · SEU ESPAÇO</span>
-  </div>
-
-  <div class="feed-header-actions">
+  <!-- Cabeçalho do Dashboard -->
+  <header class="feed-header">
 
     <button
       type="button"
-      class="header-icon"
+      class="header-profile"
       aria-label="Abrir perfil"
-      title="Perfil"
+      title="Editar perfil"
       (click)="openProfile()"
     >
-      <svg lucideUser></svg>
+      <span class="avatar header-avatar">
+        @if (profile()?.photo) {
+          <img [src]="profile()!.photo" alt="Foto de perfil">
+        } @else {
+          {{ getProfileInitials() }}
+        }
+      </span>
+
+      <span class="header-profile-info">
+        <strong>{{ profile()?.name || 'Seu espaço' }}</strong>
+
+        @if (profile()?.description) {
+          <span>{{ profile()?.description }}</span>
+        } @else {
+          <span class="profile-placeholder">Seu espaço pessoal</span>
+        }
+      </span>
     </button>
 
-    <button
-      type="button"
-      class="header-icon"
-      (click)="toggleTheme()"
-      [attr.aria-label]="isDarkMode() ? 'Ativar modo claro' : 'Ativar modo escuro'"
-      [attr.title]="isDarkMode() ? 'Modo claro' : 'Modo escuro'"
-    >
-      @if (isDarkMode()) {
-        <svg lucideSun></svg>
-      } @else {
-        <svg lucideMoon></svg>
-      }
-    </button>
+    <div class="feed-header-actions">
 
-  </div>
+      <button
+        type="button"
+        class="header-icon"
+        (click)="toggleTheme()"
+        [attr.aria-label]="isDarkMode() ? 'Ativar modo claro' : 'Ativar modo escuro'"
+        [attr.title]="isDarkMode() ? 'Modo claro' : 'Modo escuro'"
+      >
+        @if (isDarkMode()) {
+          <svg lucideSun></svg>
+        } @else {
+          <svg lucideMoon></svg>
+        }
+      </button>
 
-</header>
+    </div>
 
+  </header>
 
   <!-- Componente de criação de publicações -->
   <app-composer
@@ -55,7 +66,9 @@
     @if (publications().length === 0) {
       <div class="empty-feed">
         <span class="empty-decoration">✳</span>
+
         <h2>Seu espaço começa aqui.</h2>
+
         <p>
           Registre pequenas coisas, grandes momentos ou simplesmente o seu dia.
         </p>
@@ -78,9 +91,18 @@
         <header class="publication-header">
 
           <div class="publication-author">
-            <span class="avatar">L</span>
+
+            <span class="avatar">
+              @if (profile()?.photo) {
+                <img [src]="profile()!.photo" alt="Foto de perfil">
+              } @else {
+                {{ getProfileInitials() }}
+              }
+            </span>
 
             <div class="author-info">
+              <strong>{{ profile()?.name || 'Seu espaço' }}</strong>
+
               <span>{{ formatDate(post.date) }}</span>
 
               @if (getEditTime(post.editedAt); as editTime) {
@@ -89,6 +111,7 @@
                 </span>
               }
             </div>
+
           </div>
 
           <div class="publication-menu">
@@ -122,11 +145,15 @@
             }
 
           </div>
+
         </header>
 
         <!-- Fotografia -->
         @if (post.image) {
-          <div class="publication-image">
+          <div
+            class="publication-image"
+            (click)="openImage(post.image)"
+          >
             <img
               [src]="post.image"
               alt="Fotografia da publicação">
@@ -180,6 +207,43 @@
 
         </div>
       </div>
+
+    </div>
+  }
+
+  <!-- Visualização ampliada das fotografias -->
+  @if (selectedImage()) {
+    <div class="image-overlay" (click)="closeImage()">
+
+      <button
+        type="button"
+        class="image-close"
+        aria-label="Fechar imagem"
+        (click)="closeImage()">
+        ×
+      </button>
+
+      <button
+        type="button"
+        class="image-navigation previous"
+        aria-label="Imagem anterior"
+        (click)="previousImage($event)">
+        ‹
+      </button>
+
+      <img
+        class="expanded-image"
+        [src]="selectedImage()"
+        alt="Fotografia ampliada"
+        (click)="$event.stopPropagation()">
+
+      <button
+        type="button"
+        class="image-navigation next"
+        aria-label="Próxima imagem"
+        (click)="nextImage($event)">
+        ›
+      </button>
 
     </div>
   }
